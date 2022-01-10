@@ -40,12 +40,20 @@ function appendToSpreadsheet(spreadsheetId, range, values) {
     });
 };
 
-app.get("/api/v1/addEmail", async (req, res) => {
+app.get("/email", async (req, res) => {
     const { firstName, email } = req.body;
     const emailListSpreadsheetId = process.env.EMAIL_LIST_SPREADSHEET_ID;
-    const values = [[email, "", firstName]];
-    await appendToSpreadsheet(emailListSpreadsheetId, "Sheet1!A:C", values);
-    res.json({ response: "email sent!" });
+    if (firstName == null && email == null) {
+      res.json({ response: "400 Bad Request: missing first name and email!" });
+    } else if (firstName == null) {
+      res.json({ response: "400 Bad Request: missing first name!" });
+    } else if (email == null) {
+      res.json({ response: "400 Bad Request: missing email address!" });
+    } else {
+      const values = [[email, "", firstName]];
+      await appendToSpreadsheet(emailListSpreadsheetId, "Sheet1!A:C", values);
+      res.json({ response: "email sent!" });
+    }
 });
 
 app.listen(PORT, () => {
