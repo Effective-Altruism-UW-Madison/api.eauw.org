@@ -18,13 +18,31 @@ import express from "express";
 import bodyParser from "body-parser";
 import { google } from "googleapis";
 import dotenv from "dotenv";
+import swaggerJSDoc from "swagger-jsdoc";
 dotenv.config();
 
 const PORT = 3000;
-// TO DO: GET API KEY
 const API_KEY = process.env.API_KEY;
 const app = express();
 app.use(bodyParser.json());
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: "Email API",
+      description: "Email API Information",
+      contact: {
+        name: "Effective Altruism UW-Madison",
+        url: "https://eauw.org/",
+        email: "contact@eauw.org"
+      },
+      servers: ["http://localhost:3000"]
+    }
+  },
+  apis: ["index.js"]
+}
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
+app.use("/docs", swaggerUi.serve, swaggerui.setup(swaggerDocs));
 
 const sheets = google.sheets({ 
     version: "v4",
@@ -40,6 +58,17 @@ function appendToSpreadsheet(spreadsheetId, range, values) {
     });
 };
 
+/**
+ * @swagger
+ * /email:
+ *  get:
+ *    description: Use to add to the email list
+ *    responses:
+ *      '200':
+ *        description: Successful response
+ *      '400':
+ *        description: Missing value error response
+ */
 app.get("/email", async (req, res) => {
     const { firstName, email } = req.body;
     const emailListSpreadsheetId = process.env.EMAIL_LIST_SPREADSHEET_ID;
