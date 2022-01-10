@@ -46,7 +46,7 @@ app.use("/docs", swaggerUi.serve, swaggerui.setup(swaggerDocs));
 
 const sheets = google.sheets({ 
     version: "v4",
-    auth: API_KEY,
+    auth: API_KEY
 });
 
 function appendToSpreadsheet(spreadsheetId, range, values) {
@@ -54,7 +54,7 @@ function appendToSpreadsheet(spreadsheetId, range, values) {
         spreadsheetId: spreadsheetId,
         range: range,
         valueInputOption: "USER_ENTERED",
-        requestBody: { values: values },
+        requestBody: { values: values }
     });
 };
 
