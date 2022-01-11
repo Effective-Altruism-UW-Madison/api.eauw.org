@@ -1,2 +1,3 @@
 ﻿# api.eauw.org
-Allows the website to add members to the email list.
+
+A web API to facilitate automations and services relevant to our organization including adding emails to the mailing list, sending emails, and reading calendar events.
