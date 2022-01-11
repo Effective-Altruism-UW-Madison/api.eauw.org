@@ -1,3 +1,16 @@
-.env
-node_modules
+# code editors
+.idea/
+.vscode/
+
+# cache
 .eslintcache
+
+# node
+node_modules
+
+# environment
+.env
+.env.local
+
+# macOS
+.DS_Store
