@@ -1,6 +1,7 @@
 # code editors
 .idea/
 .vscode/
+dist/
 
 # cache
 .eslintcache
