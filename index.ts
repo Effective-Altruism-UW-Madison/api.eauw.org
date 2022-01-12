@@ -12,9 +12,11 @@ Intended response example:
 
 {
   "response": "email sent!"
-} */
+}
 
-/* TO DO:
+*/
+
+/* TODO:
 
 - Authenticate for Google Groups
 - Fix Swagger documentation
@@ -30,15 +32,17 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const PORT = 3000;
-
 interface ProcessVariables extends NodeJS.ProcessEnv {
-  API_KEY: string,
-  GROUP_KEY: string,
-  EMAIL_LIST_SPREADSHEET_ID: string,
+  API_KEY: string;
+  GROUP_KEY: string;
+  EMAIL_LIST_SPREADSHEET_ID: string;
 }
 
-const { API_KEY, GROUP_KEY, EMAIL_LIST_SPREADSHEET_ID } = process.env as ProcessVariables;
+const { API_KEY, GROUP_KEY, EMAIL_LIST_SPREADSHEET_ID } =
+  process.env as ProcessVariables;
+
+const PORT = 3000;
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -60,17 +64,17 @@ app.use(bodyParser.json());
 // const swaggerDocs = swaggerJSDoc(swaggerOptions);
 // app.use("/docs", swaggerUi.serve, swaggerui.setup(swaggerDocs));
 
-const SCOPES = [
-  "https://www.googleapis.com/auth/admin.directory.group",
-  "https://www.googleapis.com/auth/admin.directory.group.member",
-  "https://www.googleapis.com/auth/drive",
-  "https://www.googleapis.com/auth/drive.file",
-  "https://www.googleapis.com/auth/spreadsheets",
-];
+// const SCOPES = [
+//   "https://www.googleapis.com/auth/admin.directory.group",
+//   "https://www.googleapis.com/auth/admin.directory.group.member",
+//   "https://www.googleapis.com/auth/drive",
+//   "https://www.googleapis.com/auth/drive.file",
+//   "https://www.googleapis.com/auth/spreadsheets"
+// ];
 
-const TOKEN_PATH = "token.json";
-fs.readFile("credentials.json", (err, content) => {
-  authorize()
+// const TOKEN_PATH = "token.json";
+fs.readFile("credentials.json", (/* err, content */) => {
+  // authorize();
 });
 
 const sheets = google.sheets({
@@ -85,18 +89,22 @@ const admin = google.admin({
 
 function addToGroup(groupKey: string, email: string) {
   return admin.members.insert({
-    groupKey: groupKey,
+    groupKey,
     requestBody: {
-      email: email,
-      role: "MEMBER",
+      email,
+      role: "MEMBER"
     }
-  })
+  });
 }
 
-function appendToSpreadsheet(spreadsheetId: string, range: string, values: string[][]) {
+function appendToSpreadsheet(
+  spreadsheetId: string,
+  range: string,
+  values: string[][]
+) {
   return sheets.spreadsheets.values.append({
-    spreadsheetId: spreadsheetId,
-    range: range,
+    spreadsheetId,
+    range,
     valueInputOption: "USER_ENTERED",
     requestBody: { values }
   });
@@ -126,7 +134,11 @@ app.post("/email", async (req: Request, res: Response) => {
       res.status(400).json({ error: "missing email!" });
     } else {
       const values = [[email, "", firstName]];
-      await appendToSpreadsheet(EMAIL_LIST_SPREADSHEET_ID, "Sheet1!A:C", values);
+      await appendToSpreadsheet(
+        EMAIL_LIST_SPREADSHEET_ID,
+        "Sheet1!A:C",
+        values
+      );
       await addToGroup(GROUP_KEY, email);
       res.status(200).json({ message: "email sent!" });
     }
