@@ -12,9 +12,9 @@ Intended response example:
 
 {
   "response": "email sent!"
-} */
+}
 
-/* TO DO:
+TO DO:
 
 - Authenticate for Google Groups
 - Fix Swagger documentation
@@ -60,17 +60,15 @@ app.use(bodyParser.json());
 // const swaggerDocs = swaggerJSDoc(swaggerOptions);
 // app.use("/docs", swaggerUi.serve, swaggerui.setup(swaggerDocs));
 
-const SCOPES = [
-  "https://www.googleapis.com/auth/admin.directory.group",
-  "https://www.googleapis.com/auth/admin.directory.group.member",
-  "https://www.googleapis.com/auth/drive",
-  "https://www.googleapis.com/auth/drive.file",
-  "https://www.googleapis.com/auth/spreadsheets",
-];
-
-const TOKEN_PATH = "token.json";
-fs.readFile("credentials.json", (err, content) => {
-  authorize()
+const auth = new google.auth.GoogleAuth({
+  keyFile: "./google-key.json",
+  scopes: [
+      // "https://www.googleapis.com/auth/admin.directory.group",
+      // "https://www.googleapis.com/auth/admin.directory.group.member",
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/spreadsheets",
+  ],
 });
 
 const sheets = google.sheets({
@@ -85,11 +83,11 @@ const admin = google.admin({
 
 function addToGroup(groupKey: string, email: string) {
   return admin.members.insert({
-    groupKey: groupKey,
-    requestBody: {
-      email: email,
-      role: "MEMBER",
-    }
+      groupKey: groupKey,
+      requestBody: {
+          email: email,
+          role: "MEMBER",
+      }
   })
 }
 
