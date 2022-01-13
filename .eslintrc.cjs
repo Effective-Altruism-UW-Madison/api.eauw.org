@@ -17,7 +17,10 @@ module.exports = {
     sourceType: "module"
   },
   rules: {
-    quotes: ["error", "double"],
-    "comma-dangle": ["error", "never"]
+    "@typescript-eslint/no-explicit-any": "off",
+    "quotes": ["error", "double"],
+    "quote-props": ["error", "consistent"],
+    "comma-dangle": ["error", "never"],
+    "operator-linebreak": ["error", "after"]
   }
 };
