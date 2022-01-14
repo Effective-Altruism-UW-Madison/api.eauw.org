@@ -56,7 +56,10 @@ const swaggerOptions: Options = {
         url: "https://eauw.org/",
         email: "contact@eauw.org"
       },
-      servers: ["http://localhost:3000"],
+      servers: [
+        { url: "http://localhost:3000", description: "Development server" },
+        { url: "https://api.eauw.org", description: "Production server" }
+      ],
       version: "0.1"
     }
   },
@@ -113,14 +116,36 @@ function appendToSpreadsheet(
  * @swagger
  * /email:
  *  post:
- *    description: Use to add to the email list
+ *    description: Attempts to add email to list
+ *                 (Google Sheets and Google Groups)
+ *                 by dispatching a queue worker.
+ *                 A confirmation email is also sent.
+ *    parameters:
+ *      - in: body
+ *        name: request
+ *        required: true
+ *        description: Email request
+ *        schema:
+ *          type: object
+ *          required:
+ *            - firstName
+ *            - email
+ *        properties:
+ *          firstName:
+ *            type: string
+ *            description: First name of person
+ *            example: "Peter"
+ *          email:
+ *            type: string
+ *            description: Email address of person
+ *            example: "singer@eauw.org"
  *    responses:
  *      '200':
- *        description: Successful response
+ *        description: Email was received and queue worker was dispatched
  *      '400':
- *        description: Missing value error response
+ *        description: Field validation error
  *      '500':
- *        description: Miscellaneous error
+ *        description: Internal server error
  */
 app.post("/email", async (req: Request, res: Response) => {
   try {
