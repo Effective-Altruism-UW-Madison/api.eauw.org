@@ -25,6 +25,8 @@ TO DO:
 import fs from "fs";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import swaggerJSDoc, { Options } from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 import { google } from "googleapis";
 import dotenv from "dotenv";
 
@@ -44,23 +46,24 @@ const PORT = 3000;
 const app = express();
 app.use(bodyParser.json());
 
-// const swaggerOptions = {
-//   swaggerDefinition: {
-//     info: {
-//       title: "Email API",
-//       description: "Email API Information",
-//       contact: {
-//         name: "Effective Altruism UW-Madison",
-//         url: "https://eauw.org/",
-//         email: "contact@eauw.org"
-//       },
-//       servers: ["http://localhost:3000"]
-//     }
-//   },
-//   apis: ["index.js"]
-// };
-// const swaggerDocs = swaggerJSDoc(swaggerOptions);
-// app.use("/docs", swaggerUi.serve, swaggerui.setup(swaggerDocs));
+const swaggerOptions: Options = {
+  swaggerDefinition: {
+    info: {
+      title: "Email API",
+      description: "Email API Information",
+      contact: {
+        name: "Effective Altruism UW–Madison",
+        url: "https://eauw.org/",
+        email: "contact@eauw.org"
+      },
+      servers: ["http://localhost:3000"],
+      version: "0.1"
+    }
+  },
+  apis: ["index.ts"]
+};
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 const auth = new google.auth.GoogleAuth({
   keyFile: "./google-key.json",
@@ -109,7 +112,7 @@ function appendToSpreadsheet(
 /**
  * @swagger
  * /email:
- *  get:
+ *  post:
  *    description: Use to add to the email list
  *    responses:
  *      '200':
