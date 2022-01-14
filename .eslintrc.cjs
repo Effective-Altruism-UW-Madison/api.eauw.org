@@ -20,6 +20,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     "quotes": ["error", "double"],
     "quote-props": ["error", "consistent"],
+    "no-multi-str": "off",
     "comma-dangle": ["error", "never"],
     "operator-linebreak": ["error", "after"]
   }

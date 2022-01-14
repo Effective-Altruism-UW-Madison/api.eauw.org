@@ -22,11 +22,10 @@ TO DO:
 
 */
 
-import fs from "fs";
+// import fs from "fs";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
-import swaggerJSDoc, { Options } from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import expressJSDocSwagger from "express-jsdoc-swagger";
 import { google } from "googleapis";
 import dotenv from "dotenv";
 
@@ -46,38 +45,47 @@ const PORT = 3000;
 const app = express();
 app.use(bodyParser.json());
 
-const swaggerOptions: Options = {
-  swaggerDefinition: {
-    info: {
-      title: "Email API",
-      description: "Email API Information",
-      contact: {
-        name: "Effective Altruism UW–Madison",
-        url: "https://eauw.org/",
-        email: "contact@eauw.org"
-      },
-      servers: [
-        { url: "http://localhost:3000", description: "Development server" },
-        { url: "https://api.eauw.org", description: "Production server" }
-      ],
-      version: "0.1"
+const options = {
+  info: {
+    version: "0.0.1",
+    title: "Effective Altruism UW–Madison API",
+    description:
+      "API for Effective Altruism UW–Madison website and other services. \
+      Facilitates newsletter sign-ups, sending emails, listing events, and more.",
+    contact: {
+      name: "Effective Altruism UW–Madison",
+      url: "https://eauw.org/",
+      email: "contact@eauw.org"
+    },
+    license: {
+      name: "MIT"
     }
   },
-  apis: ["index.ts"]
+  servers: [
+    { url: "http://localhost:3000", description: "Development server" },
+    { url: "https://api.eauw.org", description: "Production server" }
+  ],
+  baseDir: __dirname,
+  filesPattern: "*.ts",
+  exposeSwaggerUI: true,
+  swaggerUIPath: "/docs",
+  exposeApiDocs: true,
+  apiDocsPath: "/swagger.json",
+  notRequiredAsNullable: false
 };
-const swaggerDocs = swaggerJSDoc(swaggerOptions);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const auth = new google.auth.GoogleAuth({
-  keyFile: "./google-key.json",
-  scopes: [
-    // "https://www.googleapis.com/auth/admin.directory.group",
-    // "https://www.googleapis.com/auth/admin.directory.group.member",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/spreadsheets"
-  ]
-});
+expressJSDocSwagger(app)(options);
+
+// const auth = new google.auth.GoogleAuth({
+//   keyFile: "./google-key.json",
+//   scopes: [
+//     // "https://www.googleapis.com/auth/admin.directory.group",
+//     // "https://www.googleapis.com/auth/admin.directory.group.member",
+//     "https://www.googleapis.com/auth/drive",
+//     "https://www.googleapis.com/auth/drive.file",
+//     "https://www.googleapis.com/auth/spreadsheets"
+//   ]
+// });
 
 const sheets = google.sheets({
   version: "v4",
@@ -113,39 +121,16 @@ function appendToSpreadsheet(
 }
 
 /**
- * @swagger
- * /email:
- *  post:
- *    description: Attempts to add email to list
- *                 (Google Sheets and Google Groups)
- *                 by dispatching a queue worker.
- *                 A confirmation email is also sent.
- *    parameters:
- *      - in: body
- *        name: request
- *        required: true
- *        description: Email request
- *        schema:
- *          type: object
- *          required:
- *            - firstName
- *            - email
- *        properties:
- *          firstName:
- *            type: string
- *            description: First name of person
- *            example: "Peter"
- *          email:
- *            type: string
- *            description: Email address of person
- *            example: "singer@eauw.org"
- *    responses:
- *      '200':
- *        description: Email was received and queue worker was dispatched
- *      '400':
- *        description: Field validation error
- *      '500':
- *        description: Internal server error
+ * POST /email
+ * @summary Attempts to add email to list
+ *          (Google Sheets and Google Groups)
+ *          by dispatching a queue worker.
+ *          A confirmation email is also sent.
+ * @tags email
+ * @param {string} firstName.query.required - the first name to add to the list
+ * @param {string} email.query.required - the email to add to the list
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
  */
 app.post("/email", async (req: Request, res: Response) => {
   try {
