@@ -14,24 +14,22 @@ Intended response example:
   "response": "email sent!"
 }
 
-TO DO:
-
+TODO:
 - Complete authentication
   - Adjust functions for TypeScript by specifying necessary parameter types
   - Replace console logs
 - Complete queue
   - Include add to email list process
-
 */
 
 import fs from "fs";
-import readline from "readline";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
-import swaggerJSDoc, { Options } from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import expressJSDocSwagger from "express-jsdoc-swagger";
 import { google } from "googleapis";
 // Error: router not being imported from bull-board
+// Note: there is no router in bull-board... read the docs
+// https://github.com/felixmosh/bull-board#hello-world
 import { router } from "bull-board";
 import dotenv from "dotenv";
 
@@ -50,29 +48,50 @@ const PORT = 3000;
 
 const app = express();
 app.use(bodyParser.json());
-app.use("/admin/queues", router);
+// app.use("/admin/queues", router);
 
-const swaggerOptions = {
-  swaggerDefinition: {
-    info: {
-      title: "Email API",
-      description: "Email API Information",
-      contact: {
-        name: "Effective Altruism UW-Madison",
-        url: "https://eauw.org/",
-        email: "contact@eauw.org"
-      },
-      servers: ["http://localhost:3000"]
+
+const options = {
+  info: {
+    version: "0.0.1",
+    title: "Effective Altruism UW–Madison API",
+    description:
+      "API for Effective Altruism UW–Madison website and other services. \
+      Facilitates newsletter sign-ups, sending emails, listing events, and more.",
+    contact: {
+      name: "Effective Altruism UW–Madison",
+      url: "https://eauw.org/",
+      email: "contact@eauw.org"
+    },
+    license: {
+      name: "MIT"
     }
   },
-  apis: ["index.ts"]
+  servers: [
+    { url: "http://localhost:3000", description: "Development server" },
+    { url: "https://api.eauw.org", description: "Production server" }
+  ],
+  baseDir: __dirname,
+  filesPattern: "*.ts",
+  exposeSwaggerUI: true,
+  swaggerUIPath: "/docs",
+  exposeApiDocs: true,
+  apiDocsPath: "/swagger.json",
+  notRequiredAsNullable: false
 };
-// Error: type error
-const swaggerDocs = swaggerJSDoc(swaggerOptions);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const SCOPES = ["https://www.googleapis.com/auth/admin.directory.user"];
-const TOKEN_PATH = "token.json";
+expressJSDocSwagger(app)(options);
+
+// const auth = new google.auth.GoogleAuth({
+//   keyFile: "./google-key.json",
+//   scopes: [
+//     // "https://www.googleapis.com/auth/admin.directory.group",
+//     // "https://www.googleapis.com/auth/admin.directory.group.member",
+//     "https://www.googleapis.com/auth/drive",
+//     "https://www.googleapis.com/auth/drive.file",
+//     "https://www.googleapis.com/auth/spreadsheets"
+//   ]
+// });
 
 // Error: need to define the types here for typescript, but not sure exactly what types go in
 function getNewToken(oauth2Client, callback) {
@@ -107,21 +126,6 @@ function authorize(credentials, callback) {
   });
 }
 
-const admin = google.admin({
-  version: "directory_v1",
-  auth: API_KEY
-});
-
-function addToGroup(groupKey: string, email: string) {
-  return admin.members.insert({
-    groupKey,
-    requestBody: {
-      email,
-      role: "MEMBER"
-    }
-  });
-}
-
 fs.readFile("credentials.json", (err, content) => {
   if (err) return console.error("Error loading client secret file", err);
   authorize(JSON.parse(content), addToGroup);
@@ -139,6 +143,21 @@ const sheets = google.sheets({
   auth: API_KEY
 });
 
+const admin = google.admin({
+  version: "directory_v1",
+  auth: API_KEY
+});
+
+function addToGroup(groupKey: string, email: string) {
+  return admin.members.insert({
+    groupKey,
+    requestBody: {
+      email,
+      role: "MEMBER"
+    }
+  });
+}
+
 function appendToSpreadsheet(
   spreadsheetId: string,
   range: string,
@@ -153,17 +172,16 @@ function appendToSpreadsheet(
 }
 
 /**
- * @swagger
- * /email:
- *  post:
- *    description: Use to add to the email list
- *    responses:
- *      '200':
- *        description: Successful response
- *      '400':
- *        description: Missing value error response
- *      '500':
- *        description: Miscellaneous error
+ * POST /email
+ * @summary Attempts to add email to list
+ *          (Google Sheets and Google Groups)
+ *          by dispatching a queue worker.
+ *          A confirmation email is also sent.
+ * @tags email
+ * @param {string} firstName.query.required - the first name to add to the list
+ * @param {string} email.query.required - the email to add to the list
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
  */
 app.post("/email", async (req: Request, res: Response) => {
   try {
@@ -176,6 +194,8 @@ app.post("/email", async (req: Request, res: Response) => {
       res.status(400).json({ error: "missing email!" });
     } else {
       const values = [[email, "", firstName]];
+      // THE ONLY FUNCTION YOU SHOULD CALL HERE 
+      // IS THE ONE FROM YOUR QUEUE TO DISPATCH THE WORKER
       await appendToSpreadsheet(
         EMAIL_LIST_SPREADSHEET_ID,
         "Sheet1!A:C",
@@ -187,25 +207,6 @@ app.post("/email", async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ error: error.toString() });
   }
-});
-
-/**
- * @swagger
- * /email:
- *  post:
- *    description: Use to add to the email list
- *    responses:
- *      '200':
- *        description: Successful response
- */
-app.post("/send-email", async (req, res) => {
-  const { message, ...restBody } = req.body;
-  // Error: sendNewEmail not exporting from queue.ts properly
-  await sendNewEmail({
-    ...restBody,
-    html: `<p>${message}</p>`
-  });
-  res.status(200).json({ message: "message sent!" });
 });
 
 app.listen(PORT, () => {
