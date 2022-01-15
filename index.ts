@@ -16,16 +16,23 @@ Intended response example:
 
 TO DO:
 
-- Authenticate for Google Groups
-- Fix Swagger documentation
-- Implement queue
+- Complete authentication
+  - Adjust functions for TypeScript by specifying necessary parameter types
+  - Replace console logs
+- Complete queue
+  - Include add to email list process
 
 */
 
 import fs from "fs";
+import readline from "readline";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import swaggerJSDoc, { Options } from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 import { google } from "googleapis";
+// Error: router not being imported from bull-board
+import { router } from "bull-board";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -43,40 +50,62 @@ const PORT = 3000;
 
 const app = express();
 app.use(bodyParser.json());
+app.use("/admin/queues", router);
 
-// const swaggerOptions = {
-//   swaggerDefinition: {
-//     info: {
-//       title: "Email API",
-//       description: "Email API Information",
-//       contact: {
-//         name: "Effective Altruism UW-Madison",
-//         url: "https://eauw.org/",
-//         email: "contact@eauw.org"
-//       },
-//       servers: ["http://localhost:3000"]
-//     }
-//   },
-//   apis: ["index.js"]
-// };
-// const swaggerDocs = swaggerJSDoc(swaggerOptions);
-// app.use("/docs", swaggerUi.serve, swaggerui.setup(swaggerDocs));
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: "Email API",
+      description: "Email API Information",
+      contact: {
+        name: "Effective Altruism UW-Madison",
+        url: "https://eauw.org/",
+        email: "contact@eauw.org"
+      },
+      servers: ["http://localhost:3000"]
+    }
+  },
+  apis: ["index.ts"]
+};
+// Error: type error
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const auth = new google.auth.GoogleAuth({
-  keyFile: "./google-key.json",
-  scopes: [
-    // "https://www.googleapis.com/auth/admin.directory.group",
-    // "https://www.googleapis.com/auth/admin.directory.group.member",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/spreadsheets"
-  ]
-});
+const SCOPES = ["https://www.googleapis.com/auth/admin.directory.user"];
+const TOKEN_PATH = "token.json";
 
-const sheets = google.sheets({
-  version: "v4",
-  auth: API_KEY
-});
+// Error: need to define the types here for typescript, but not sure exactly what types go in
+function getNewToken(oauth2Client, callback) {
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: SCOPES
+  });
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  rl.question("Enter the code from that page here: ", (code) => {
+    rl.close();
+    // Error: need to define the types here for typescript, but not sure exactly what types go in
+    oauth2Client.getToken(code, (err, token) => {
+      if (err) return console.error("Error retrieving access token", err);
+      oauth2Client.credentials = token;
+      storeToken(token);
+      callback(oauth2Client);
+    });
+  });
+}
+
+// Error: need to define the types here for typescript, but not sure exactly what types go in
+function authorize(credentials, callback) {
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+  fs.readFile(TOKEN_PATH, (err, token) => {
+    if (err) return getNewToken(oauth2Client, callback);
+    oauth2Client.credentials = JSON.parse(token);
+    callback(oauth2Client);
+  });
+}
 
 const admin = google.admin({
   version: "directory_v1",
@@ -92,6 +121,23 @@ function addToGroup(groupKey: string, email: string) {
     }
   });
 }
+
+fs.readFile("credentials.json", (err, content) => {
+  if (err) return console.error("Error loading client secret file", err);
+  authorize(JSON.parse(content), addToGroup);
+});
+
+function storeToken(token) {
+  fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+    if (err) return console.warn(`Token not stored to ${TOKEN_PATH}`, err);
+    console.log(`Token stored to ${TOKEN_PATH}`);
+  });
+}
+
+const sheets = google.sheets({
+  version: "v4",
+  auth: API_KEY
+});
 
 function appendToSpreadsheet(
   spreadsheetId: string,
@@ -109,7 +155,7 @@ function appendToSpreadsheet(
 /**
  * @swagger
  * /email:
- *  get:
+ *  post:
  *    description: Use to add to the email list
  *    responses:
  *      '200':
@@ -141,6 +187,25 @@ app.post("/email", async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ error: error.toString() });
   }
+});
+
+/**
+ * @swagger
+ * /email:
+ *  post:
+ *    description: Use to add to the email list
+ *    responses:
+ *      '200':
+ *        description: Successful response
+ */
+app.post("/send-email", async (req, res) => {
+  const { message, ...restBody } = req.body;
+  // Error: sendNewEmail not exporting from queue.ts properly
+  await sendNewEmail({
+    ...restBody,
+    html: `<p>${message}</p>`
+  });
+  res.status(200).json({ message: "message sent!" });
 });
 
 app.listen(PORT, () => {

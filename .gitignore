@@ -15,3 +15,6 @@ node_modules
 
 # macOS
 .DS_Store
+
+# credentials
+credentials.json
