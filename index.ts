@@ -14,24 +14,23 @@ Intended response example:
   "response": "email sent!"
 }
 
-TODO:
-- Complete authentication
-  - Adjust functions for TypeScript by specifying necessary parameter types
-  - Replace console logs
-- Complete queue
-  - Include add to email list process
+TO DO:
+
+- Authenticate for Google Groups
+- Fix Swagger documentation
+- Implement queue
+
 */
 
-import fs from "fs";
+// import fs from "fs";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import { google } from "googleapis";
-// Error: router not being imported from bull-board
-// Note: there is no router in bull-board... read the docs
-// https://github.com/felixmosh/bull-board#hello-world
-import { router } from "bull-board";
 import dotenv from "dotenv";
+
+import nodemailer from "nodemailer";
+import Mail from "nodemailer/lib/mailer";
 
 dotenv.config();
 
@@ -48,8 +47,6 @@ const PORT = 3000;
 
 const app = express();
 app.use(bodyParser.json());
-// app.use("/admin/queues", router);
-
 
 const options = {
   info: {
@@ -93,51 +90,6 @@ expressJSDocSwagger(app)(options);
 //   ]
 // });
 
-// Error: need to define the types here for typescript, but not sure exactly what types go in
-function getNewToken(oauth2Client, callback) {
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: SCOPES
-  });
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  rl.question("Enter the code from that page here: ", (code) => {
-    rl.close();
-    // Error: need to define the types here for typescript, but not sure exactly what types go in
-    oauth2Client.getToken(code, (err, token) => {
-      if (err) return console.error("Error retrieving access token", err);
-      oauth2Client.credentials = token;
-      storeToken(token);
-      callback(oauth2Client);
-    });
-  });
-}
-
-// Error: need to define the types here for typescript, but not sure exactly what types go in
-function authorize(credentials, callback) {
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
-  const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getNewToken(oauth2Client, callback);
-    oauth2Client.credentials = JSON.parse(token);
-    callback(oauth2Client);
-  });
-}
-
-fs.readFile("credentials.json", (err, content) => {
-  if (err) return console.error("Error loading client secret file", err);
-  authorize(JSON.parse(content), addToGroup);
-});
-
-function storeToken(token) {
-  fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-    if (err) return console.warn(`Token not stored to ${TOKEN_PATH}`, err);
-    console.log(`Token stored to ${TOKEN_PATH}`);
-  });
-}
-
 const sheets = google.sheets({
   version: "v4",
   auth: API_KEY
@@ -171,6 +123,23 @@ function appendToSpreadsheet(
   });
 }
 
+const ourEmail = process.env.EMAIL;
+
+const transporter = nodemailer.createTransport({
+  host: process.env.HOSTNAME,
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    type: 'OAuth2',
+    user: ourEmail,
+    pass: process.env.PASS,
+    clientId: process.env.OAUTH_CLIENTID,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.OAUTH_REFRESH_TOKEN
+  }
+});
+
 /**
  * POST /email
  * @summary Attempts to add email to list
@@ -194,14 +163,21 @@ app.post("/email", async (req: Request, res: Response) => {
       res.status(400).json({ error: "missing email!" });
     } else {
       const values = [[email, "", firstName]];
-      // THE ONLY FUNCTION YOU SHOULD CALL HERE 
-      // IS THE ONE FROM YOUR QUEUE TO DISPATCH THE WORKER
       await appendToSpreadsheet(
         EMAIL_LIST_SPREADSHEET_ID,
         "Sheet1!A:C",
         values
       );
       await addToGroup(GROUP_KEY, email);
+      const mailOptions = {
+        from: ourEmail,
+        to: email,
+        subject: 'subject',
+        text: ''
+      };
+      transporter.sendMail(mailOptions, (error: any) => {
+        res.status(500).json({ error: error.toString() });
+      });
       res.status(200).json({ message: "email sent!" });
     }
   } catch (error: any) {
