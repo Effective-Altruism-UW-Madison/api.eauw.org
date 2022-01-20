@@ -6,8 +6,10 @@ WORKDIR /var/app
 
 COPY package.json /var/app
 
-RUN npm install
+RUN npm install --force
 
 COPY . /var/app
 
 CMD ["npm", "run", "dev"]
+
+### FOR DEVELOPMENT USE ONLY ###
