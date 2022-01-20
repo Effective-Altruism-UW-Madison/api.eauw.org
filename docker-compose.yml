@@ -4,14 +4,14 @@ services:
 
   redis:
     image: redis
-    container_name: tutorial_redis
+    container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - 6379:6379
 
   redis-commander:
-    container_name: tutorial_redis-commander
+    container_name: redis-commander
     image: rediscommander/redis-commander
     restart: always
     environment:
@@ -20,13 +20,11 @@ services:
       - "8081:8081"
 
   server:
-    container_name: tutorial_backend
+    container_name: server
     build:
       context: ./
     environment:
       REDIS_URL: redis:6379
-      CHOKIDAR_USEPOLLING: 'true'
-      CHOKIDAR_INTERVAL: 1000
     ports:
      - 5000:5000
     volumes:
