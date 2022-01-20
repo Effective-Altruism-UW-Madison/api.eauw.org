@@ -22,6 +22,14 @@ module.exports = {
     "quote-props": ["error", "consistent"],
     "no-multi-str": "off",
     "comma-dangle": ["error", "never"],
-    "operator-linebreak": ["error", "after"]
+    "operator-linebreak": ["error", "after"],
+    "import/extensions": 0
+  },
+  settings: {
+    "import/resolver": {
+      "node": {
+        "extensions": [".ts"]
+      }
+    }
   }
 };
