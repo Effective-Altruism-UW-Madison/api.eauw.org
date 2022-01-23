@@ -1,17 +1,8 @@
 import { Job } from "bull";
 import nodemailer from "nodemailer";
 
-const sendNewEmail = async (job: Job, data: string[]) => {
-  // const auth = new google.auth.GoogleAuth({
-  //   keyFile: "./google-key.json",
-  //   scopes: [
-  //     // "https://www.googleapis.com/auth/admin.directory.group",
-  //     // "https://www.googleapis.com/auth/admin.directory.group.member",
-  //     "https://www.googleapis.com/auth/drive",
-  //     "https://www.googleapis.com/auth/drive.file",
-  //     "https://www.googleapis.com/auth/spreadsheets"
-  //   ]
-  // });
+const sendNewEmail = async (job: Job) => {
+  const { data } = job.data;
 
   const ourEmail = process.env.EMAIL;
 
