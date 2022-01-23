@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable consistent-return */
 import { Job } from "bull";
 import fs from "fs";
@@ -74,11 +75,11 @@ const addToGroups = async (job: Job) => {
    * @param {function} callback The callback to call with the authorized client.
    */
   function authorize(credentials: any, callback: any) {
-    const { clientSecret, clientId, redirectUris } = credentials.installed;
+    const { client_secret, client_id, redirect_uris } = credentials.installed;
     const oauth2Client = new google.auth.OAuth2(
-      clientId,
-      clientSecret,
-      redirectUris[0]
+      client_id,
+      client_secret,
+      redirect_uris[0]
     );
 
     // Check if we have previously stored a token.
