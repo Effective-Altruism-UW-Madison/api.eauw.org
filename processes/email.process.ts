@@ -21,7 +21,7 @@ const sendNewEmail = async (job: Job) => {
 
   const mailOptions = {
     from: ourEmail,
-    to: data[0],
+    to: data.email,
     subject: "subject",
     text: `Hello, ${data.firstName}`
   };
