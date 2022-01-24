@@ -13,25 +13,55 @@ interface ProcessVariables extends NodeJS.ProcessEnv {
 
 const { REDIS_URL } = process.env as ProcessVariables;
 
-const emailQueue = new Bull("emailQueue", REDIS_URL);
+const queue = new Bull("emailQueue", REDIS_URL);
 
 const serverAdapter = new ExpressAdapter();
 
 const {
-  addQueue, removeQueue, setQueues, replaceQueues
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  addQueue,
+  removeQueue,
+  setQueues,
+  replaceQueues
 } = createBullBoard({
-  queues: [new BullAdapter(emailQueue)],
+  queues: [new BullAdapter(queue)],
   serverAdapter
 });
 
-emailQueue.process(sendNewEmail);
-emailQueue.process(addToGroups);
-emailQueue.process(addToSpreadsheet);
-
-const addNewEmail = (email: string, firstName: string) => {
-  emailQueue.add([email, firstName], {
-    attempts: 5
+const createJob = (options: any, data: any) => {
+  const opts = { priority: 0, attempts: 5 };
+  queue.add(options, data, {
+    attempts: opts.attempts,
+    backoff: {
+      type: "exponential",
+      delay: 2000
+    },
+    removeOnComplete: true,
+    removeOnFail: true
   });
 };
+
+queue.process("Add To Groups", (job) => addToGroups(job.data));
+queue.process("Add To Spreadsheet", (job) => addToSpreadsheet(job.data));
+queue.process("Send New Email", (job) => sendNewEmail(job.data));
+
+async function addNewEmail(email: string, firstName: string) {
+  const data = {
+    email: `${email}`,
+    firstName: `${firstName}`
+  };
+  createJob("Add to Groups", data);
+  createJob("Add To Spreadsheet", data);
+  createJob("Send New Email", data);
+}
+
+// const addNewEmail = (email: string, firstName: string) => {
+//   queue.add({
+//     email: `${email}`,
+//     firstName: `${firstName}`
+//   }, {
+//     attempts: 5
+//   });
+// };
 
 export default addNewEmail;

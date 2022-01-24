@@ -114,7 +114,7 @@ const addToGroups = async (job: Job) => {
     authorize(JSON.parse(content), addToGroup);
   });
 
-  await addToGroup(GROUP_KEY, data[0]);
+  await addToGroup(GROUP_KEY, data.email);
 };
 
 export default addToGroups;

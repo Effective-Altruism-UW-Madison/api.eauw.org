@@ -23,7 +23,7 @@ const sendNewEmail = async (job: Job) => {
     from: ourEmail,
     to: data[0],
     subject: "subject",
-    text: `Hello, ${data[1]}`
+    text: `Hello, ${data.firstName}`
   };
   transporter.sendMail(mailOptions);
 };

@@ -119,7 +119,7 @@ const addToSpreadsheet = async (job: Job) => {
     authorize(JSON.parse(content), appendToSpreadsheet);
   });
 
-  const values = [[data[0], "", data[1]]];
+  const values = [[data.email, "", data.firstName]];
   await appendToSpreadsheet(EMAIL_LIST_SPREADSHEET_ID, "Sheet1!A:C", values);
 };
 
