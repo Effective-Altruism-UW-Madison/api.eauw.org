@@ -8,23 +8,17 @@ import addToGroups from "../processes/groups.process";
 import addToSpreadsheet from "../processes/spreadsheet.process";
 
 interface ProcessVariables extends NodeJS.ProcessEnv {
-  REDIS_URL: string;
+  REDIS_PORT: string;
 }
 
-const { REDIS_URL } = process.env as ProcessVariables;
+const { REDIS_PORT } = process.env as ProcessVariables;
 
-const queue = new Bull("emailQueue", {
-  redis: REDIS_URL
-});
+const queue = new Bull("emailQueue", "redis://127.0.0.1:6379");
 
 const serverAdapter = new ExpressAdapter();
 
 const {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setQueues,
-  replaceQueues,
-  addQueue,
-  removeQueue
+  setQueues, replaceQueues, addQueue, removeQueue
 } = createBullBoard({
   queues: [new BullAdapter(queue)],
   serverAdapter
