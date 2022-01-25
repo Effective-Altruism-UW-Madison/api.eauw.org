@@ -13,7 +13,9 @@ interface ProcessVariables extends NodeJS.ProcessEnv {
 
 const { REDIS_URL } = process.env as ProcessVariables;
 
-const queue = new Bull("emailQueue", REDIS_URL);
+const queue = new Bull("emailQueue", {
+  redis: REDIS_URL
+});
 
 const serverAdapter = new ExpressAdapter();
 
