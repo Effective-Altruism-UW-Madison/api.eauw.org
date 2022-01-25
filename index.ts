@@ -27,7 +27,7 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import dotenv from "dotenv";
-import addNewEmail from "./queues/email.queue";
+import { addNewEmail, serverAdapter } from "./queues/email.queue";
 
 dotenv.config();
 
@@ -66,6 +66,13 @@ const options = {
 };
 
 expressJSDocSwagger(app)(options);
+
+/**
+ * USE /queues
+ * @summary Use queue for Bull Board
+ */
+serverAdapter.setBasePath("/queues");
+app.use("/queues", serverAdapter.getRouter());
 
 /**
  * POST /email

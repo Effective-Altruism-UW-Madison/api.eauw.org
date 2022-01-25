@@ -19,10 +19,10 @@ const serverAdapter = new ExpressAdapter();
 
 const {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  addQueue,
-  removeQueue,
   setQueues,
-  replaceQueues
+  replaceQueues,
+  addQueue,
+  removeQueue
 } = createBullBoard({
   queues: [new BullAdapter(queue)],
   serverAdapter
@@ -55,13 +55,4 @@ async function addNewEmail(email: string, firstName: string) {
   createJob("Send New Email", data);
 }
 
-// const addNewEmail = (email: string, firstName: string) => {
-//   queue.add({
-//     email: `${email}`,
-//     firstName: `${firstName}`
-//   }, {
-//     attempts: 5
-//   });
-// };
-
-export default addNewEmail;
+export { addNewEmail, serverAdapter };
