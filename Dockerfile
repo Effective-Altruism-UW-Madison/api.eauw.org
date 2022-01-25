@@ -9,3 +9,5 @@ RUN npm install --force
 COPY . /var/app
 
 CMD ["npm", "run", "dev"]
+
+### FOR DEVELOPMENT USE ONLY ###
