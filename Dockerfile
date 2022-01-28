@@ -1,3 +1,5 @@
+### FOR DEVELOPMENT USE ONLY ###
+
 FROM node:16
 
 WORKDIR /var/app
