@@ -4,9 +4,7 @@ module.exports = {
     node: true
   },
   parser: "@typescript-eslint/parser",
-  plugins: [
-    "@typescript-eslint"
-  ],
+  plugins: ["@typescript-eslint"],
   extends: [
     "airbnb-base",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -22,13 +20,15 @@ module.exports = {
     "quote-props": ["error", "consistent"],
     "no-multi-str": "off",
     "comma-dangle": ["error", "never"],
-    "operator-linebreak": ["error", "after"],
-    "import/extensions": 0
+    "function-paren-newline": 0,
+    "implicit-arrow-linebreak": 0,
+    "import/extensions": 0,
+    "operator-linebreak": 0
   },
   settings: {
     "import/resolver": {
-      "node": {
-        "extensions": [".ts"]
+      node: {
+        extensions: [".ts"]
       }
     }
   }

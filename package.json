@@ -4,7 +4,7 @@
     "dev": "nodemon --exec ts-node index.ts",
     "build": "tsc",
     "prepare": "husky install",
-    "format": "prettier --config .prettierrc.cjs --write '*.+(ts*|js*)'",
+    "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -41,6 +41,6 @@
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
-    "*.+(ts*|js*)": "prettier --config .prettierrc.cjs --write"
+    "*": "prettier --config .prettierrc.cjs --write"
   }
 }

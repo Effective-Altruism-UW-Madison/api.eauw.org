@@ -1,6 +1,8 @@
 # code editors
 .idea/
 .vscode/
+
+# artifacts
 dist/
 
 # cache
@@ -17,4 +19,4 @@ node_modules
 .DS_Store
 
 # credentials
-credentials.json
+service-account-credentials.json

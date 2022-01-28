@@ -3,52 +3,43 @@ import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 
-import sendNewEmail from "../processes/email.process";
+import sendConfirmationEmail from "../processes/confirmationEmail.process";
 import addToGroups from "../processes/groups.process";
 import addToSpreadsheet from "../processes/spreadsheet.process";
 
-interface ProcessVariables extends NodeJS.ProcessEnv {
-  REDIS_PORT: string;
-}
-
-const { REDIS_PORT } = process.env as ProcessVariables;
-
-const queue = new Bull("emailQueue", "redis://127.0.0.1:6379");
+const queue = new Bull("/email", "redis://127.0.0.1:6379");
 
 const serverAdapter = new ExpressAdapter();
 
-const {
-  setQueues, replaceQueues, addQueue, removeQueue
-} = createBullBoard({
+createBullBoard({
   queues: [new BullAdapter(queue)],
   serverAdapter
 });
 
-const createJob = (options: any, data: any) => {
-  const opts = { priority: 0, attempts: 5 };
-  queue.add(options, data, {
-    attempts: opts.attempts,
-    backoff: {
-      type: "exponential",
-      delay: 2000
-    },
-    removeOnComplete: true,
-    removeOnFail: true
+const createJob = (name: string, data: any) => {
+  queue.add(name, data, {
+    attempts: 2
   });
 };
 
-queue.process("Add To Groups", (job) => addToGroups(job.data));
-queue.process("Add To Spreadsheet", (job) => addToSpreadsheet(job.data));
-queue.process("Send New Email", (job) => sendNewEmail(job.data));
+const GROUPS_PROCESS_NAME = "Add to Google Groups";
+const SPREADSHEET_PROCESS_NAME = "Add to Google Spreadsheet";
+const CONFIRMATION_EMAIL_PROCESS_NAME = "Send Confirmation Email";
 
-async function addNewEmail(email: string, firstName: string) {
+queue.process(GROUPS_PROCESS_NAME, (job) => addToGroups(job));
+queue.process(SPREADSHEET_PROCESS_NAME, (job) => addToSpreadsheet(job));
+queue.process(CONFIRMATION_EMAIL_PROCESS_NAME, (job) =>
+  sendConfirmationEmail(job)
+);
+
+const addNewEmail = async (email: string, firstName: string) => {
   const data = {
-    email: `${email}`,
-    firstName: `${firstName}`
+    email,
+    firstName
   };
-  createJob("Add to Groups", data);
-  createJob("Add To Spreadsheet", data);
-  createJob("Send New Email", data);
-}
+  createJob(GROUPS_PROCESS_NAME, data);
+  createJob(SPREADSHEET_PROCESS_NAME, data);
+  createJob(CONFIRMATION_EMAIL_PROCESS_NAME, data);
+};
 
 export { addNewEmail, serverAdapter };

@@ -1,28 +1,3 @@
-/* Intended request example:
-
-curl --request POST \
-  --url https://api.eauw.org/email \
-  --header 'Content-Type: application/json' \
-  --data '{
-  "firstName": "Peter",
-  "email": "singer@eauw.org"
-}'
-
-Intended response example:
-
-{
-  "response": "email sent!"
-}
-
-TO DO:
-
-- Authenticate for Google Groups
-- Fix Swagger documentation
-- Implement queue
-
-*/
-
-// import fs from "fs";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import expressJSDocSwagger from "express-jsdoc-swagger";
@@ -38,13 +13,16 @@ app.use(bodyParser.json());
 
 const options = {
   info: {
-    version: "0.0.1",
-    title: "Effective Altruism UW–Madison API",
+    version:
+      process.env.npm_package_version !== undefined
+        ? process.env.npm_package_version
+        : "UNDEFINED",
+    title: "Effective Altruism UW\u2013Madison API",
     description:
-      "API for Effective Altruism UW–Madison website and other services. \
+      "API for Effective Altruism UW\u2013Madison website and other services. \
       Facilitates newsletter sign-ups, sending emails, listing events, and more.",
     contact: {
-      name: "Effective Altruism UW–Madison",
+      name: "Effective Altruism UW\u2013Madison",
       url: "https://eauw.org/",
       email: "contact@eauw.org"
     },
@@ -68,8 +46,7 @@ const options = {
 expressJSDocSwagger(app)(options);
 
 /**
- * USE /queues
- * @summary Use queue for Bull Board
+  Use queue for Bull Board
  */
 serverAdapter.setBasePath("/queues");
 app.use("/queues", serverAdapter.getRouter());
@@ -89,19 +66,21 @@ app.use("/queues", serverAdapter.getRouter());
 app.post("/email", async (req: Request, res: Response) => {
   try {
     const { firstName, email } = req.body;
-    if (firstName == null && email == null) {
-      res.status(400).json({ error: "missing first name and email!" });
-    } else if (firstName == null) {
-      res.status(400).json({ error: "missing first name!" });
-    } else if (email == null) {
-      res.status(400).json({ error: "missing email!" });
-    } else {
-      await addNewEmail(email, firstName);
+    if (firstName === null && email === null) {
+      return res.status(400).json({ error: "missing first name and email!" });
     }
+    if (firstName === null) {
+      return res.status(400).json({ error: "missing first name!" });
+    }
+    if (email === null) {
+      return res.status(400).json({ error: "missing email!" });
+    }
+    await addNewEmail(email, firstName);
   } catch (error: any) {
-    res.status(500).json({ error: error.toString() });
+    return res.status(500).json({ error: error.toString() });
   }
-  res.status(200).json({ message: "email sent!" });
+
+  return res.status(200).json({ message: "email registered." });
 });
 
 app.listen(PORT, () => {
