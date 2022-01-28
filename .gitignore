@@ -1,6 +1,8 @@
 # code editors
 .idea/
 .vscode/
+
+# artifacts
 dist/
 
 # cache
@@ -15,3 +17,6 @@ node_modules
 
 # macOS
 .DS_Store
+
+# credentials
+service-account-credentials.json
