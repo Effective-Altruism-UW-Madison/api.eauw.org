@@ -6,7 +6,7 @@ import { addNewEmail, serverAdapter } from "./queues/email.queue";
 
 dotenv.config();
 
-const PORT = 3000;
+const PORT = 3000 || process.env.PORT;
 
 const app = express();
 app.use(bodyParser.json());
@@ -35,7 +35,7 @@ const options = {
     { url: "https://api.eauw.org", description: "Production server" }
   ],
   baseDir: __dirname,
-  filesPattern: "*.ts",
+  filesPattern: "*.+(ts|js)",
   exposeSwaggerUI: true,
   swaggerUIPath: "/docs",
   exposeApiDocs: true,

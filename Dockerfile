@@ -1,15 +1,15 @@
-### FOR DEVELOPMENT USE ONLY ###
-
 FROM node:16
 
 WORKDIR /var/app
 
 COPY package.json /var/app
 
-RUN npm install --force
+RUN npm install --force --only=prod --ignore-scripts && npm cache clean --force
+
+RUN npm install pm2 -g
 
 COPY . /var/app
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
 
-### FOR DEVELOPMENT USE ONLY ###
+CMD [ "pm2-runtime", "dist/index.js" ]
