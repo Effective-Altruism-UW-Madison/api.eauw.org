@@ -23,7 +23,7 @@ const addToGroups = async (job: Job) => {
     job.log(`Adding ${address} to group...`);
     admin.members
       .insert({
-        groupKey: "newsletter@eauw.org",
+        groupKey: process.env.GROUP_ID,
         requestBody: {
           email: address,
           role: "MEMBER"

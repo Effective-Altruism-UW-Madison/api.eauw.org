@@ -17,6 +17,7 @@
     "express": "^4.17.2",
     "express-jsdoc-swagger": "^1.6.7",
     "googleapis": "^92.0.0",
+    "handlebars": "^4.7.7",
     "nodemailer": "^6.7.2"
   },
   "devDependencies": {
