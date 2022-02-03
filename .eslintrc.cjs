@@ -14,6 +14,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module"
   },
+  ignorePatterns: ["node_modules", "dist", "assets"],
   rules: {
     "@typescript-eslint/no-explicit-any": "off",
     "quotes": ["error", "double"],

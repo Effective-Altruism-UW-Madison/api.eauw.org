@@ -1,3 +1,9 @@
+# npm
 node_modules/
-dist/
 package-lock.json
+
+# build artifacts
+dist/
+
+# assets
+assets/
