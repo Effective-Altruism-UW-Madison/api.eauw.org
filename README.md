@@ -9,7 +9,7 @@ A web API to facilitate automations and services relevant to our organization in
 #### Create an `.env` file
 
 ``` sh
-cp .env.exmaple .env
+cp .env.example .env
 ```
 
 #### Google Service Account Credentials
