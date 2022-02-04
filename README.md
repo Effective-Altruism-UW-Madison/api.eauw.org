@@ -6,13 +6,19 @@ A web API to facilitate automations and services relevant to our organization in
 
 ### Requirements
 
+#### Create an `.env` file
+
+``` sh
+cp .env.exmaple .env
+```
+
 #### Google Service Account Credentials
 
 1. Create a new project in the Google Cloud Console. 
 2. Enable the Admin SDK API, the Google Spreadsheets API, and other APIs as needed.
 3. Create a new service account and export the JSON credentials.
-4. A valid JSON will have `"type": "service_account"` as the first key-value pair. 
-5. Set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the path of the JSON.
+   - A valid JSON will have `"type": "service_account"` as the first key-value pair. 
+4. Set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the path of the JSON.
 
 > Note: API calls can only be made if the "subject" field in the body is set to an admin of the Google Workspace. Set `GOOGLE_WORKSPACE_ADMIN_ACCOUNT` to the email address of an admin in your workspace.
 
