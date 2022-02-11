@@ -58,7 +58,6 @@ app.use("/queues", serverAdapter.getRouter());
  *          by dispatching a queue worker.
  *          A confirmation email is also sent.
  * @tags email
- * @security BasicAuth
  * @param {string} firstName.query.required - the first name to add to the list
  * @param {string} email.query.required - the email to add to the list
  * @return {object} 200 - success response - application/json
