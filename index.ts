@@ -58,10 +58,24 @@ app.use("/queues", serverAdapter.getRouter());
  *          by dispatching a queue worker.
  *          A confirmation email is also sent.
  * @tags email
+ * @security BasicAuth
  * @param {string} firstName.query.required - the first name to add to the list
  * @param {string} email.query.required - the email to add to the list
  * @return {object} 200 - success response - application/json
+ * @example response - 200 - success response example
+ * {
+ *  "message": "email registered."
+ * }
  * @return {object} 400 - Bad request response
+ * @example response - 400 - Bad request response example
+ * {
+ *  "error": "missing email!"
+ * }
+ * @return {object} 500 - error response
+ * @example response - 500 - error response example
+ * {
+ *  "error": "null has no properties"
+ * }
  */
 app.post("/email", async (req: Request, res: Response) => {
   try {
