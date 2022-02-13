@@ -17,29 +17,6 @@ const app = express();
 
 app.use(bodyParser.json());
 
-passport.use(
-  new LocalStrategy((username: string, password: string, cb: any) => {
-    if (username === "bull" && password === "board") {
-      return cb(null, { user: "bull-board" });
-    }
-    return cb(null, false);
-  })
-);
-
-passport.serializeUser((user: any, cb) => {
-  cb(null, user);
-});
-
-passport.deserializeUser((user: any, cb) => {
-  cb(null, user);
-});
-
-app.use(
-  session({ secret: "keyboard cat", saveUninitialized: true, resave: true })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
 const options = {
   info: {
     version:
@@ -74,14 +51,42 @@ const options = {
 
 expressJSDocSwagger(app)(options);
 
+app.use(express.static("public"));
+app.set("views", "./views");
+app.set("view engine", "ejs");
+
+app.get("/", (req: Request, res: Response) => {
+  res.render("index");
+});
+
 /**
   Protect queues route
  */
 
-app.set("views", "./views");
-app.set("view engine", "ejs");
+passport.use(
+  new LocalStrategy((username: string, password: string, cb: any) => {
+    if (username === "bull" && password === "board") {
+      return cb(null, { user: "bull-board" });
+    }
+    return cb(null, false);
+  })
+);
 
-app.get("/login", (req, res) => {
+passport.serializeUser((user: any, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser((user: any, cb) => {
+  cb(null, user);
+});
+
+app.use(
+  session({ secret: "keyboard cat", saveUninitialized: true, resave: true })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/login", (req: Request, res: Response) => {
   res.render("login", { invalid: req.query.invalid === "true" });
 });
 
@@ -99,7 +104,7 @@ app.post(
 serverAdapter.setBasePath("/admin");
 app.use(
   "/admin",
-  ensureLoggedIn({ redirectTo: "/need-to-fix" }),
+  ensureLoggedIn({ redirectTo: "/login" }),
   serverAdapter.getRouter()
 );
 
