@@ -77,8 +77,12 @@ expressJSDocSwagger(app)(options);
 /**
   Protect queues route
  */
+
+app.set("views", "./views");
+app.set("view engine", "ejs");
+
 app.get("/login", (req, res) => {
-  res.json({ invalid: req.query.invalid === "true" });
+  res.render("login", { invalid: req.query.invalid === "true" });
 });
 
 app.post(
@@ -95,7 +99,7 @@ app.post(
 serverAdapter.setBasePath("/admin");
 app.use(
   "/admin",
-  ensureLoggedIn({ redirectTo: "/login" }),
+  ensureLoggedIn({ redirectTo: "/need-to-fix" }),
   serverAdapter.getRouter()
 );
 
