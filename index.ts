@@ -1,16 +1,21 @@
+import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { ensureLoggedIn } from "connect-ensure-login";
 import session from "express-session";
 import expressJSDocSwagger from "express-jsdoc-swagger";
-import dotenv from "dotenv";
 
-import passport from "passport";
-
-import { ensureLoggedIn } from "connect-ensure-login";
 import { addNewEmail, serverAdapter } from "./queues/email.queue";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const LocalStrategy = require("passport-local").Strategy;
+dotenv.config();
+
+const PORT = process.env.PORT || 3000;
+
+const app = express();
+
+app.use(bodyParser.json());
 
 passport.use(
   new LocalStrategy((username: string, password: string, cb: any) => {
@@ -29,16 +34,9 @@ passport.deserializeUser((user: any, cb) => {
   cb(null, user);
 });
 
-dotenv.config();
-
-const PORT = process.env.PORT || 3000;
-
-const app = express();
-
 app.use(
   session({ secret: "keyboard cat", saveUninitialized: true, resave: true })
 );
-app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -79,25 +77,25 @@ expressJSDocSwagger(app)(options);
 /**
   Protect queues route
  */
-app.get("/ui/login", (req, res) => {
+app.get("/login", (req, res) => {
   res.json({ invalid: req.query.invalid === "true" });
 });
 
 app.post(
-  "/ui/login",
-  passport.authenticate("local", { failureRedirect: "/ui/login?invalid=true" }),
+  "/login",
+  passport.authenticate("local", { failureRedirect: "/login?invalid=true" }),
   (req, res) => {
-    res.redirect("/ui");
+    res.redirect("/admin");
   }
 );
 
 /**
   Use queue for Bull Board
  */
-serverAdapter.setBasePath("/queues");
+serverAdapter.setBasePath("/admin");
 app.use(
-  "/queues",
-  ensureLoggedIn({ redirectTo: "/ui/login" }),
+  "/admin",
+  ensureLoggedIn({ redirectTo: "/login" }),
   serverAdapter.getRouter()
 );
 
