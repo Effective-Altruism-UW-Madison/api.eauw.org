@@ -26,9 +26,9 @@ const GROUPS_PROCESS_NAME = "Add to Google Groups";
 const SPREADSHEET_PROCESS_NAME = "Add to Google Spreadsheet";
 const CONFIRMATION_EMAIL_PROCESS_NAME = "Send Confirmation Email";
 
-queue.process(GROUPS_PROCESS_NAME, (job) => addToGroups(job));
-queue.process(SPREADSHEET_PROCESS_NAME, (job) => addToSpreadsheet(job));
-queue.process(CONFIRMATION_EMAIL_PROCESS_NAME, (job) =>
+queue.process(GROUPS_PROCESS_NAME, (job: any) => addToGroups(job));
+queue.process(SPREADSHEET_PROCESS_NAME, (job: any) => addToSpreadsheet(job));
+queue.process(CONFIRMATION_EMAIL_PROCESS_NAME, (job: any) =>
   sendConfirmationEmail(job)
 );
 

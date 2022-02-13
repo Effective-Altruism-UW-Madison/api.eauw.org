@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import path from "path";
 import fs from "fs";
 import handlebars from "handlebars";
+import process from "process";
 
 const sendConfirmationEmail = async (job: Job) => {
   const transporter = nodemailer.createTransport({

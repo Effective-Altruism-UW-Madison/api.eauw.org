@@ -1,5 +1,6 @@
 import { Job } from "bull";
 import { google } from "googleapis";
+import process from "process";
 
 const addToSpreadsheet = async (job: Job) => {
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -34,7 +35,7 @@ const addToSpreadsheet = async (job: Job) => {
         job.progress(100);
         job.log("Spreadsheet updated.");
       })
-      .catch((err) => {
+      .catch((err: any) => {
         job.moveToFailed(err, true);
       });
   };

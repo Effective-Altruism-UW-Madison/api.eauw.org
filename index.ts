@@ -1,15 +1,46 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import session from "express-session";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import dotenv from "dotenv";
+
+import passport from "passport";
+
+import { ensureLoggedIn } from "connect-ensure-login";
 import { addNewEmail, serverAdapter } from "./queues/email.queue";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const LocalStrategy = require("passport-local").Strategy;
+
+passport.use(
+  new LocalStrategy((username: string, password: string, cb: any) => {
+    if (username === "bull" && password === "board") {
+      return cb(null, { user: "bull-board" });
+    }
+    return cb(null, false);
+  })
+);
+
+passport.serializeUser((user: any, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser((user: any, cb) => {
+  cb(null, user);
+});
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
+app.use(
+  session({ secret: "keyboard cat", saveUninitialized: true, resave: true })
+);
 app.use(bodyParser.json());
+app.use(passport.initialize());
+app.use(passport.session());
 
 const options = {
   info: {
@@ -46,10 +77,29 @@ const options = {
 expressJSDocSwagger(app)(options);
 
 /**
+  Protect queues route
+ */
+app.get("/ui/login", (req, res) => {
+  res.json({ invalid: req.query.invalid === "true" });
+});
+
+app.post(
+  "/ui/login",
+  passport.authenticate("local", { failureRedirect: "/ui/login?invalid=true" }),
+  (req, res) => {
+    res.redirect("/ui");
+  }
+);
+
+/**
   Use queue for Bull Board
  */
 serverAdapter.setBasePath("/queues");
-app.use("/queues", serverAdapter.getRouter());
+app.use(
+  "/queues",
+  ensureLoggedIn({ redirectTo: "/ui/login" }),
+  serverAdapter.getRouter()
+);
 
 /**
  * POST /email
