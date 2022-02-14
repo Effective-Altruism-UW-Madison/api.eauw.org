@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
 import passport from "passport";
@@ -46,11 +46,11 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(passport.initialize());
 router.use(passport.session());
 
-router.get("/", ensureLoggedIn({ redirectTo: "/admin/login" }), (req, res) => {
+router.get("/", (req: Request, res: Response) => {
   res.redirect("/admin/dashboard");
 });
 
-router.get("/login", (req, res) => {
+router.get("/login", (req: Request, res: Response) => {
   res.render("login", { invalid: req.query.invalid });
 });
 
