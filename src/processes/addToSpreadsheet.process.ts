@@ -1,5 +1,6 @@
 import { Job } from "bull";
 import { google } from "googleapis";
+import process from "process";
 
 const addToSpreadsheet = async (job: Job) => {
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -15,7 +16,7 @@ const addToSpreadsheet = async (job: Job) => {
     auth
   });
 
-  const appendToSpreadsheet = (
+  const addToSpreadsheetHelper = (
     spreadsheetId: string,
     range: string,
     values: string[][]
@@ -34,7 +35,7 @@ const addToSpreadsheet = async (job: Job) => {
         job.progress(100);
         job.log("Spreadsheet updated.");
       })
-      .catch((err) => {
+      .catch((err: any) => {
         job.moveToFailed(err, true);
       });
   };
@@ -43,7 +44,7 @@ const addToSpreadsheet = async (job: Job) => {
   // Remove if necessary.
   const values = [[job.data.email, "EAM", job.data.firstName]];
   if (process.env.SPREADSHEET_ID !== undefined) {
-    appendToSpreadsheet(process.env.SPREADSHEET_ID, "Sheet1!A:C", values);
+    addToSpreadsheetHelper(process.env.SPREADSHEET_ID, "Sheet1!A:C", values);
   } else {
     job.moveToFailed({ message: "SPREADSHEET_ID not defined" }, true);
   }

@@ -3,12 +3,13 @@ import nodemailer from "nodemailer";
 import path from "path";
 import fs from "fs";
 import handlebars from "handlebars";
+import process from "process";
 
 const sendConfirmationEmail = async (job: Job) => {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: 465,
-    secure: true,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_SECURE === "true",
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
@@ -20,8 +21,8 @@ const sendConfirmationEmail = async (job: Job) => {
 
   const filePath =
     process.env.NODE_ENV === "PRODUCTION"
-      ? path.join(__dirname, "../../assets/confirmationEmail.html")
-      : path.join(__dirname, "../assets/confirmationEmail.html");
+      ? path.join(__dirname, "../../../assets/confirmationEmail.html")
+      : path.join(__dirname, "../../assets/confirmationEmail.html");
   const source = fs.readFileSync(filePath, "utf-8").toString();
   const template = handlebars.compile(source);
 

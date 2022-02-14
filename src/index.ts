@@ -1,22 +1,24 @@
+import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import expressJSDocSwagger from "express-jsdoc-swagger";
-import dotenv from "dotenv";
-import { addNewEmail, serverAdapter } from "./queues/email.queue";
+
+import { version } from "../package.json";
+import { postEmail } from "./queues/postEmail.queue";
+import router from "./board";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
 app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 const options = {
   info: {
-    version:
-      process.env.npm_package_version !== undefined
-        ? process.env.npm_package_version
-        : "UNDEFINED",
+    version,
     title: "Effective Altruism UW\u2013Madison API",
     description:
       "API for Effective Altruism UW\u2013Madison website and other services. \
@@ -27,7 +29,8 @@ const options = {
       email: "contact@eauw.org"
     },
     license: {
-      name: "MIT"
+      name: "Unlicense",
+      url: "https://unlicense.org/"
     }
   },
   servers: [
@@ -45,11 +48,19 @@ const options = {
 
 expressJSDocSwagger(app)(options);
 
+app.use(express.static("public"));
+app.set("views", "./views");
+app.set("view engine", "ejs");
+
+app.get("/", (req: Request, res: Response) => {
+  res.render("index");
+});
+
+app.use("/admin", router);
+
 /**
   Use queue for Bull Board
  */
-serverAdapter.setBasePath("/queues");
-app.use("/queues", serverAdapter.getRouter());
 
 /**
  * POST /email
@@ -88,7 +99,7 @@ app.post("/email", async (req: Request, res: Response) => {
     if (email === null) {
       return res.status(400).json({ error: "missing email!" });
     }
-    await addNewEmail(email, firstName);
+    await postEmail(email, firstName);
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });
   }

@@ -1,0 +1,17 @@
+<%- include("head.ejs") %>
+
+<title>Login</title>
+
+<div class="container">
+  <h1>Admin</h1>
+  <div class="form">
+    <form class="login-form" method="post" action="/admin/login">
+      <input type="text" name="username" placeholder="Username" />
+      <input type="password" name="password" placeholder="Password" />
+      <button>Login</button>
+      <% if (invalid) { %>
+        <p class="message error">Invalid username or password.</p>
+      <% } %>
+    </form>
+  </div>
+</div>
