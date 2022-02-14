@@ -11,6 +11,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 
+import { version } from "../package.json";
 import { postEmail, postEmailQueue } from "./queues/postEmail.queue";
 
 dotenv.config();
@@ -23,10 +24,7 @@ app.use(bodyParser.json());
 
 const options = {
   info: {
-    version:
-      process.env.npm_package_version !== undefined
-        ? process.env.npm_package_version
-        : "UNDEFINED",
+    version,
     title: "Effective Altruism UW\u2013Madison API",
     description:
       "API for Effective Altruism UW\u2013Madison website and other services. \
@@ -37,7 +35,8 @@ const options = {
       email: "contact@eauw.org"
     },
     license: {
-      name: "MIT"
+      name: "Unlicense",
+      url: "https://unlicense.org/"
     }
   },
   servers: [
