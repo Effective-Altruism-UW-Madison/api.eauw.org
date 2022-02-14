@@ -8,6 +8,7 @@ body {
   margin: 0;
   font-size: 16px;
   color: #454b52;
+  text-align: center;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

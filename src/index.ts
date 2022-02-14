@@ -1,18 +1,11 @@
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { ensureLoggedIn } from "connect-ensure-login";
-import session from "express-session";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 
-import { createBullBoard } from "@bull-board/api";
-import { BullAdapter } from "@bull-board/api/bullAdapter";
-import { ExpressAdapter } from "@bull-board/express";
-
 import { version } from "../package.json";
-import { postEmail, postEmailQueue } from "./queues/postEmail.queue";
+import { postEmail } from "./queues/postEmail.queue";
+import router from "./board";
 
 dotenv.config();
 
@@ -21,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 const options = {
   info: {
@@ -62,63 +56,11 @@ app.get("/", (req: Request, res: Response) => {
   res.render("index");
 });
 
-/**
-  Protect queues route
- */
-
-passport.use(
-  new LocalStrategy((username: string, password: string, cb: any) => {
-    if (username === "bull" && password === "board") {
-      return cb(null, { user: "bull-board" });
-    }
-    return cb(null, false);
-  })
-);
-
-passport.serializeUser((user: any, cb) => {
-  cb(null, user);
-});
-
-passport.deserializeUser((user: any, cb) => {
-  cb(null, user);
-});
-
-app.use(
-  session({
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
-    store: new session.MemoryStore()
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.get("/login", (req: Request, res: Response) => {
-  res.render("login", { invalid: req.query.invalid === "true" });
-});
-
-app.post(
-  "/login",
-  passport.authenticate("local", { failureRedirect: "/login?invalid=true" }),
-  (req, res) => {
-    res.redirect("/admin");
-  }
-);
+app.use("/admin", router);
 
 /**
   Use queue for Bull Board
  */
-
-const serverAdapter = new ExpressAdapter();
-
-createBullBoard({
-  queues: [new BullAdapter(postEmailQueue)],
-  serverAdapter
-});
-
-serverAdapter.setBasePath("/admin");
-app.use("/admin", ensureLoggedIn(), serverAdapter.getRouter());
 
 /**
  * POST /email
