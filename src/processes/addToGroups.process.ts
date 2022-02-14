@@ -19,28 +19,26 @@ const addToGroups = async (job: Job) => {
     auth
   });
 
-  const addToGroup = (address: string) => {
-    job.progress(50);
-    job.log(`Adding ${address} to group...`);
-    admin.members
-      .insert({
-        groupKey: process.env.GROUP_ID,
-        requestBody: {
-          email: address,
-          role: "MEMBER"
-        }
-      })
-      .then(() => {
-        job.progress(100);
-        job.log(`Added ${address} to group.`);
-      })
-      .catch((err) => {
-        job.log(`Failed to add ${address} to group.`);
-        job.moveToFailed(err, true);
-      });
-  };
+  const address: string = job.data.email;
 
-  addToGroup(job.data.email);
+  job.progress(50);
+  job.log(`Adding ${address} to group...`);
+  admin.members
+    .insert({
+      groupKey: process.env.GROUP_ID,
+      requestBody: {
+        email: address,
+        role: "MEMBER"
+      }
+    })
+    .then(() => {
+      job.progress(100);
+      job.log(`Added ${address} to group.`);
+    })
+    .catch((err) => {
+      job.log(`Failed to add ${address} to group.`);
+      job.moveToFailed(err, true);
+    });
 };
 
 export default addToGroups;

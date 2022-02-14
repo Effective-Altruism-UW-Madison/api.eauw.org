@@ -7,7 +7,11 @@ import { ensureLoggedIn } from "connect-ensure-login";
 import session from "express-session";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 
-import { addNewEmail, serverAdapter } from "./queues/email.queue";
+import { createBullBoard } from "@bull-board/api";
+import { BullAdapter } from "@bull-board/api/bullAdapter";
+import { ExpressAdapter } from "@bull-board/express";
+
+import { postEmail, postEmailQueue } from "./queues/postEmail.queue";
 
 dotenv.config();
 
@@ -81,7 +85,12 @@ passport.deserializeUser((user: any, cb) => {
 });
 
 app.use(
-  session({ secret: "keyboard cat", saveUninitialized: true, resave: true })
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+    store: new session.MemoryStore()
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -101,12 +110,16 @@ app.post(
 /**
   Use queue for Bull Board
  */
+
+const serverAdapter = new ExpressAdapter();
+
+createBullBoard({
+  queues: [new BullAdapter(postEmailQueue)],
+  serverAdapter
+});
+
 serverAdapter.setBasePath("/admin");
-app.use(
-  "/admin",
-  ensureLoggedIn({ redirectTo: "/login" }),
-  serverAdapter.getRouter()
-);
+app.use("/admin", ensureLoggedIn(), serverAdapter.getRouter());
 
 /**
  * POST /email
@@ -145,7 +158,7 @@ app.post("/email", async (req: Request, res: Response) => {
     if (email === null) {
       return res.status(400).json({ error: "missing email!" });
     }
-    await addNewEmail(email, firstName);
+    await postEmail(email, firstName);
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });
   }

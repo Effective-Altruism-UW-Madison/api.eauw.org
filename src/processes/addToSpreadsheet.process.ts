@@ -16,7 +16,7 @@ const addToSpreadsheet = async (job: Job) => {
     auth
   });
 
-  const appendToSpreadsheet = (
+  const addToSpreadsheetHelper = (
     spreadsheetId: string,
     range: string,
     values: string[][]
@@ -44,7 +44,7 @@ const addToSpreadsheet = async (job: Job) => {
   // Remove if necessary.
   const values = [[job.data.email, "EAM", job.data.firstName]];
   if (process.env.SPREADSHEET_ID !== undefined) {
-    appendToSpreadsheet(process.env.SPREADSHEET_ID, "Sheet1!A:C", values);
+    addToSpreadsheetHelper(process.env.SPREADSHEET_ID, "Sheet1!A:C", values);
   } else {
     job.moveToFailed({ message: "SPREADSHEET_ID not defined" }, true);
   }
