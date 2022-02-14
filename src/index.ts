@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: false }));
 
 const options = {
   info: {
@@ -76,8 +75,8 @@ app.use("/admin", router);
  * {
  *  "message": "email registered."
  * }
- * @return {object} 400 - Bad request response
- * @example response - 400 - Bad request response example
+ * @return {object} 400 - bad request response
+ * @example response - 400 - bad request response example
  * {
  *  "error": "missing email!"
  * }
