@@ -58,10 +58,6 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/admin", router);
 
 /**
-  Use queue for Bull Board
- */
-
-/**
  * POST /email
  * @summary Attempts to add email to list
  *          (Google Sheets and Google Groups)
