@@ -31,48 +31,52 @@ const deleteFromSpreadsheet = async (job: Job) => {
       },
       (err, result) => {
         if (err) {
-          console.log(err);
+          job.log(`Failed to remove ${email} from group.`);
+          job.moveToFailed(
+            { message: "Could not grab spreadsheet values." },
+            true
+          );
         } else {
           const values = result?.data.values;
-          if (values === undefined || values?.length === 0) {
-            // stop job
-            throw new Error("No data found");
-          }
+          if (values === undefined || values === null || values?.length === 0) {
+            job.log(`Failed to remove ${email} from group.`);
+            job.moveToFailed(
+              { message: "Could not grab spreadsheet values." },
+              true
+            );
+          } else {
+            // find row with email within 2D array values
+            const row: number =
+              values.findIndex((arr) => arr.includes(email)) + 1;
 
-          const row: number =
-            values!.findIndex((arr) => arr.includes(email)) + 2;
-
-          sheets.spreadsheets
-            .batchUpdate({
-              // The spreadsheet to apply the updates to.
-              spreadsheetId,
-              // Request body metadata
-              requestBody: {
-                requests: [
-                  {
-                    deleteRange: {
-                      range: {
-                        sheetId: 0,
-                        startRowIndex: row,
-                        endRowIndex: 1
-                      },
-                      shiftDimension: "ROWS"
+            sheets.spreadsheets
+              .batchUpdate({
+                spreadsheetId,
+                requestBody: {
+                  requests: [
+                    {
+                      deleteRange: {
+                        range: {
+                          sheetId: 0,
+                          startRowIndex: row - 1, // exclusive
+                          endRowIndex: row // inclusive
+                        },
+                        shiftDimension: "ROWS"
+                      }
                     }
-                  }
-                ]
-                //   "responseIncludeGridData": false,
-                //   "responseRanges": []
-                // }
-              }
-            })
-            .then(() => {
-              job.progress(100);
-              job.log("Spreadsheet updated.");
-            })
-            // eslint-disable-next-line no-shadow
-            .catch((err: any) => {
-              job.moveToFailed(err, true);
-            });
+                  ]
+                }
+              })
+              .then(() => {
+                job.progress(100);
+                job.log("Spreadsheet updated.");
+              })
+              // eslint-disable-next-line no-shadow
+              .catch((err: any) => {
+                job.log(`Failed to remove ${email} from group.`);
+                job.moveToFailed(err, true);
+              });
+          }
         }
       }
     );
@@ -85,7 +89,7 @@ const deleteFromSpreadsheet = async (job: Job) => {
   if (process.env.SPREADSHEET_ID !== undefined) {
     deleteFromSpreadsheetHelper(
       process.env.SPREADSHEET_ID,
-      "Sheet1!A:C",
+      "Sheet1!A:D",
       search
     );
   } else {

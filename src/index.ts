@@ -125,7 +125,7 @@ app.post("/email", async (req: Request, res: Response) => {
 app.delete("/email", async (req: Request, res: Response) => {
   try {
     const address = req.query.address as string;
-    if (address === null) {
+    if (address === null || address === "" || address === undefined) {
       return res.status(400).json({ error: "missing email!" });
     }
 
