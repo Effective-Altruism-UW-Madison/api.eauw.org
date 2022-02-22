@@ -5,6 +5,7 @@ import expressJSDocSwagger from "express-jsdoc-swagger";
 
 import { version } from "../package.json";
 import { postEmail } from "./queues/postEmail.queue";
+import { deleteEmail } from "./queues/deleteEmail.queue";
 import router from "./board";
 
 dotenv.config();
@@ -100,6 +101,40 @@ app.post("/email", async (req: Request, res: Response) => {
   }
 
   return res.status(200).json({ message: "email registered." });
+});
+
+/**
+ * DELETE /email
+ * @summary Attempts to delete email from list
+ *          (Google Sheets and Google Groups)
+ *          by dispatching 2 queue workers.
+ *          A confirmation email is also sent.
+ * @tags email
+ * @param {string} email.query.required - the email that we want to remove
+ * @return {object} 200 - success response - application/json
+ * @example response - 200 - success response example
+ * {
+ *  "message": "email removed."
+ * }
+ * @return {object} 500 - error response
+ * @example response - 500 - error response example
+ * {
+ *  "error": "null has no properties"
+ * }
+ */
+app.delete("/email", async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (email === null) {
+      return res.status(400).json({ error: "missing email!" });
+    }
+
+    await deleteEmail(email);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.toString() });
+  }
+
+  return res.status(200).json({ message: "email removed." });
 });
 
 app.listen(PORT, () => {
