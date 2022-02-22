@@ -124,12 +124,12 @@ app.post("/email", async (req: Request, res: Response) => {
  */
 app.delete("/email", async (req: Request, res: Response) => {
   try {
-    const email = req.query.email as string;
-    if (email === null) {
+    const address = req.query.address as string;
+    if (address === null) {
       return res.status(400).json({ error: "missing email!" });
     }
 
-    await deleteEmail(email);
+    await deleteEmail(address);
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });
   }
