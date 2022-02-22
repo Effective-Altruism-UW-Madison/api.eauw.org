@@ -9,12 +9,6 @@ const postEmailQueue = new Bull(
   process.env.REDIS_URL || "redis://127.0.0.1:6379"
 );
 
-const createJob = (name: string, data: any) => {
-  postEmailQueue.add(name, data, {
-    attempts: 3
-  });
-};
-
 const GROUPS_PROCESS_NAME = "Add to Google Groups";
 const SPREADSHEET_PROCESS_NAME = "Add to Google Spreadsheet";
 const CONFIRMATION_EMAIL_PROCESS_NAME = "Send Confirmation Email";
@@ -26,6 +20,12 @@ postEmailQueue.process(SPREADSHEET_PROCESS_NAME, (job: any) =>
 postEmailQueue.process(CONFIRMATION_EMAIL_PROCESS_NAME, (job: any) =>
   sendConfirmationEmail(job)
 );
+
+const createJob = (name: string, data: any) => {
+  postEmailQueue.add(name, data, {
+    attempts: 3
+  });
+};
 
 const postEmail = async (email: string, firstName: string) => {
   const data = {
