@@ -1,0 +1,75 @@
+<%- include("head.ejs") %>
+
+<title>Unsubscribe</title>
+
+<% if (!address) { %>
+  <div class="container">
+    <h1>Unsubscribe</h1>
+    <div class="form">
+      <form>
+        <input type="email" name="email" placeholder="Email" />
+        <input type="submit" value="Unsubscribe" />
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      window.location.href = `/email/unsubscribe?address=${form.email.value}`;
+    });
+  </script>
+<% } %> 
+
+<% if (address) { %>
+  <div class="container">
+    <h1>Unsubscribe</h1>
+    <p>Successfully removed from the mailing list.</p>
+    <div class="form">
+      <p style="margin-bottom: 50px">
+        Could we have done something better?
+        <a href="https://go.eauw.org/feedback">Let us know</a>.
+      </p>
+      <form method="POST" action="/email">
+        <input name="firstName" placeholder="First name" />
+        <input type="email" name="email" value=<%= address %> />
+        <input type="submit" value="Resubscribe" />
+      </form>
+    </div>
+  </div>
+
+  <script>
+    fetch("/email", {
+      method: "DELETE",
+      body: JSON.stringify({ email: "<%= address %>" }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((obj) => {
+        console.log(obj);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      fetch("/email", {
+        method: "POST",
+        body: JSON.stringify({
+          firstName: `${form.firstName.value}`,
+          email: `${form.email.value}`
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        }
+      }).then(() => alert("Successfully subscribed!"));
+    });
+  </script>
+<% } %>

@@ -59,14 +59,26 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/admin", router);
 
 /**
+ * An subscription object
+ * @typedef {object} Subscription
+ * @property {string} firstName.required - the first name to add to the list
+ * @property {string} email.required - the email to add to the list
+ */
+
+/**
+ * An unsubscription object
+ * @typedef {object} Unsubscription
+ * @property {string} email.required - the email to remove from the list
+ */
+
+/**
  * POST /email
  * @summary Attempts to add email to list
  *          (Google Sheets and Google Groups)
  *          by dispatching a queue worker.
  *          A confirmation email is also sent.
  * @tags email
- * @param {string} firstName.query.required - the first name to add to the list
- * @param {string} email.query.required - the email to add to the list
+ * @param {Subscription} request.body.required - the subscription object - application/json
  * @return {object} 200 - success response - application/json
  * @example response - 200 - success response example
  * {
@@ -86,13 +98,13 @@ app.use("/admin", router);
 app.post("/email", async (req: Request, res: Response) => {
   try {
     const { firstName, email } = req.body;
-    if (firstName === null && email === null) {
+    if (!firstName && !email) {
       return res.status(400).json({ error: "missing first name and email!" });
     }
-    if (firstName === null) {
+    if (!firstName) {
       return res.status(400).json({ error: "missing first name!" });
     }
-    if (email === null) {
+    if (!email) {
       return res.status(400).json({ error: "missing email!" });
     }
     await postEmail(email, firstName);
@@ -107,10 +119,9 @@ app.post("/email", async (req: Request, res: Response) => {
  * DELETE /email
  * @summary Attempts to delete email from list
  *          (Google Sheets and Google Groups)
- *          by dispatching 2 queue workers.
- *          A confirmation email is also sent.
+ *          by dispatching a queue worker.
  * @tags email
- * @param {string} email.query.required - the email that we want to remove
+ * @param {Unsubscription} request.body.required - the unsubscription object - application/json
  * @return {object} 200 - success response - application/json
  * @example response - 200 - success response example
  * {
@@ -124,17 +135,32 @@ app.post("/email", async (req: Request, res: Response) => {
  */
 app.delete("/email", async (req: Request, res: Response) => {
   try {
-    const address = req.query.address as string;
-    if (address === null || address === "" || address === undefined) {
+    const { email } = req.body;
+    if (!email) {
       return res.status(400).json({ error: "missing email!" });
     }
 
-    await deleteEmail(address);
+    await deleteEmail(email);
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });
   }
 
   return res.status(200).json({ message: "email removed." });
+});
+
+/**
+ * GET /email/unsubscribe
+ * @summary Renders the unsubscribe page which sends a request to DELETE /email.
+ * @tags email
+ * @param {string} email.query - the email that we want to remove
+ */
+app.get("/email/unsubscribe", async (req: Request, res: Response) => {
+  try {
+    const address = req.query.address as string;
+    return res.render("unsubscribe", { address });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.toString() });
+  }
 });
 
 app.listen(PORT, () => {

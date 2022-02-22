@@ -58,7 +58,8 @@ const deleteFromSpreadsheet = async (job: Job) => {
                       deleteRange: {
                         range: {
                           sheetId: 0,
-                          startRowIndex: row - 1, // exclusive
+                          startRowIndex: row - 1, // exclusive,
+                          // also has benefit of throwing error if row doesn't exist (-1)
                           endRowIndex: row // inclusive
                         },
                         shiftDimension: "ROWS"
