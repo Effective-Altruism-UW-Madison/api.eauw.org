@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
 import passport from "passport";
@@ -9,8 +9,8 @@ import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 
-import { postEmailQueue } from "./queues/postEmail.queue";
-import { deleteEmailQueue } from "./queues/deleteEmail.queue";
+import { postEmailQueue } from "../queues/postEmail.queue";
+import { deleteEmailQueue } from "../queues/deleteEmail.queue";
 
 const router = Router();
 
