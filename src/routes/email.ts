@@ -1,3 +1,13 @@
+import { Request, Response, Router } from "express";
+import bodyParser from "body-parser";
+
+import { postEmail } from "../queues/postEmail.queue";
+import { deleteEmail } from "../queues/deleteEmail.queue";
+
+const router = Router();
+
+router.use(bodyParser.json());
+
 /**
  * A subscription object
  * @typedef {object} Subscription
@@ -11,16 +21,6 @@
  * @typedef {object} Unsubscription
  * @property {string} email.required - the email to remove from the list
  */
-
-import { Request, Response, Router } from "express";
-import bodyParser from "body-parser";
-
-import { postEmail } from "../queues/postEmail.queue";
-import { deleteEmail } from "../queues/deleteEmail.queue";
-
-const router = Router();
-
-router.use(bodyParser.json());
 
 /**
  * POST /email
