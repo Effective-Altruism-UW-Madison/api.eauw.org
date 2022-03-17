@@ -27,10 +27,11 @@ const createJob = (name: string, data: any) => {
   });
 };
 
-const postEmail = async (email: string, firstName: string) => {
+const postEmail = async (email: string, firstName: string, source: string) => {
   const data = {
     email,
-    firstName
+    firstName,
+    source
   };
   createJob(GROUPS_PROCESS_NAME, data);
   createJob(SPREADSHEET_PROCESS_NAME, data);

@@ -1,6 +1,12 @@
+# environment
+service-account-credentials.json
+
 # npm
 node_modules/
 package-lock.json
+
+# TypeScript
+tsconfig.json
 
 # build artifacts
 dist/

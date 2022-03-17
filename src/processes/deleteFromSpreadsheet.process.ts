@@ -83,8 +83,6 @@ const deleteFromSpreadsheet = async (job: Job) => {
     );
   };
 
-  // "EAM" is a proprietary contact label required for Eloqua.
-  // Remove if necessary.
   const search = job.data.email;
 
   if (process.env.SPREADSHEET_ID !== undefined) {

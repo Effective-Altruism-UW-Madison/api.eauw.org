@@ -1,3 +1,17 @@
+/**
+ * A subscription object
+ * @typedef {object} Subscription
+ * @property {string} firstName.required - the first name to add to the list
+ * @property {string} email.required - the email to add to the list
+ * @property {string} source - the source of the subscription; defaults to "unknown"
+ */
+
+/**
+ * An unsubscription object
+ * @typedef {object} Unsubscription
+ * @property {string} email.required - the email to remove from the list
+ */
+
 import { Request, Response, Router } from "express";
 import bodyParser from "body-parser";
 
@@ -7,19 +21,6 @@ import { deleteEmail } from "../queues/deleteEmail.queue";
 const router = Router();
 
 router.use(bodyParser.json());
-
-/**
- * A subscription object
- * @typedef {object} Subscription
- * @property {string} firstName.required - the first name to add to the list
- * @property {string} email.required - the email to add to the list
- */
-
-/**
- * An unsubscription object
- * @typedef {object} Unsubscription
- * @property {string} email.required - the email to remove from the list
- */
 
 /**
  * POST /email
@@ -47,7 +48,7 @@ router.use(bodyParser.json());
  */
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { firstName, email } = req.body;
+    const { firstName, email, source } = req.body;
     if (!firstName && !email) {
       return res.status(400).json({ error: "missing first name and email!" });
     }
@@ -57,7 +58,7 @@ router.post("/", async (req: Request, res: Response) => {
     if (!email) {
       return res.status(400).json({ error: "missing email!" });
     }
-    await postEmail(email, firstName);
+    await postEmail(email, firstName, source || "unknown");
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });
   }
