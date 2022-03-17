@@ -1,6 +1,5 @@
 import { Job } from "bull";
 import { google } from "googleapis";
-import process from "process";
 
 const deleteFromGroups = async (job: Job) => {
   const SCOPES = [
