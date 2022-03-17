@@ -3,7 +3,7 @@ module.exports = {
   apps: [
     {
       name: "api.eauw.org",
-      script: "dist/src/index.js",
+      script: "dist/index.js",
       env: {
         PORT: 5000,
         NODE_ENV: "PRODUCTION",

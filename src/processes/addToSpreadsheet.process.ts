@@ -42,9 +42,11 @@ const addToSpreadsheet = async (job: Job) => {
 
   // "EAM" is a proprietary contact label required for Eloqua.
   // Remove if necessary.
-  const values = [[job.data.email, "EAM", job.data.firstName, job.data.source]];
+  const values = [
+    [job.data.email, "EAM", job.data.firstName, "", job.data.source]
+  ];
   if (process.env.SPREADSHEET_ID !== undefined) {
-    addToSpreadsheetHelper(process.env.SPREADSHEET_ID, "Sheet1!A:D", values);
+    addToSpreadsheetHelper(process.env.SPREADSHEET_ID, "Sheet1!A:E", values);
   } else {
     job.moveToFailed({ message: "SPREADSHEET_ID not defined" }, true);
   }

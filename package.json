@@ -1,9 +1,10 @@
 {
   "version": "0.0.1",
   "scripts": {
-    "start": "NODE_ENV=PRODUCTION node dist/src/index.js",
+    "start": "NODE_ENV=PRODUCTION node dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "tsc",
+    "build": "swc src/ -d dist",
+    "check": "tsc --extendedDiagnostics",
     "prepare": "husky install",
     "format": "prettier --write .",
     "lint": "eslint .",
@@ -12,6 +13,8 @@
   "dependencies": {
     "@bull-board/api": "^3.9.0",
     "@bull-board/express": "^3.9.0",
+    "@swc/cli": "^0.1.55",
+    "@swc/core": "^1.2.156",
     "body-parser": "^1.19.1",
     "bull": "^4.2.0",
     "connect-ensure-login": "^0.1.1",
