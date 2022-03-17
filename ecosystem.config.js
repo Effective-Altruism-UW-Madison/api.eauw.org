@@ -5,7 +5,7 @@ module.exports = {
       name: "api.eauw.org",
       script: "dist/src/index.js",
       env: {
-        PORT: 3000,
+        PORT: 5000,
         NODE_ENV: "PRODUCTION",
         REDIS_URL: "redis://127.0.0.1:6379"
       }
