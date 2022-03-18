@@ -8,7 +8,8 @@ module.exports = {
   extends: [
     "airbnb-base",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
   parserOptions: {
     ecmaVersion: 12,
@@ -17,14 +18,13 @@ module.exports = {
   ignorePatterns: ["node_modules", "dist", "assets"],
   rules: {
     "@typescript-eslint/no-explicit-any": "off",
-    "quotes": ["error", "double"],
-    "quote-props": ["error", "consistent"],
-    "no-multi-str": "off",
-    "comma-dangle": ["error", "never"],
-    "function-paren-newline": 0,
-    "implicit-arrow-linebreak": 0,
-    "import/extensions": 0,
-    "operator-linebreak": 0
+    "quotes": [
+      "error",
+      "double",
+      { avoidEscape: true, allowTemplateLiterals: false }
+    ],
+    "import/extensions": "off",
+    "no-multi-str": "off"
   },
   settings: {
     "import/resolver": {

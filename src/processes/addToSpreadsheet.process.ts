@@ -1,6 +1,5 @@
 import { Job } from "bull";
 import { google } from "googleapis";
-import process from "process";
 
 const addToSpreadsheet = async (job: Job) => {
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
