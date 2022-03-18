@@ -1,11 +1,11 @@
 import { Job } from "bull";
-import axios, { AxiosRequestConfig } from "axios";
+import fetch from "node-fetch";
+import qs from "qs";
 
 const addToEloqua = async (job: Job) => {
-  const options: AxiosRequestConfig = {
+  const options = {
     method: "POST",
-    url: "https://explore.wisc.edu/e/f2",
-    params: { LP: "1028" },
+    qs: { LP: "1028" },
     headers: {
       "Host": "explore.wisc.edu",
       "Accept":
@@ -25,28 +25,28 @@ const addToEloqua = async (job: Job) => {
       "Pragma": "no-cache",
       "Cache-Control": "no-cache"
     },
-    data: {
+    body: qs.stringify({
       elqFormName: "EAMsubscriptionmanagementform",
       elqSiteId: "1427524768",
       elqCampaignId: "",
       Email: job.data.email,
       MOVINGeneral: "on",
       hiddenField: "EAM"
-    }
+    })
   };
 
   job.log(`Adding ${job.data.email} to Eloqua...`);
 
-  axios
-    .request(options)
-    .then((res) => {
-      console.log(res.data);
-      if (res.status === 200 && !res.data.includes("A problem has occurred")) {
+  fetch("https://explore.wisc.edu/e/f2", options)
+    .then((res) => Promise.all([res.status, res.text()]))
+    .then(([status, data]) => {
+      if (status === 200 && !data.includes("A problem has occurred")) {
         job.progress(100);
         job.log(`Added ${job.data.email} to Eloqua.`);
       } else {
+        job.log('Got response "A problem has occurred with this form."');
         job.log(`Failed to add ${job.data.email} to Eloqua.`);
-        job.moveToFailed(res.data, true);
+        job.moveToFailed({ message: data.replace(/<(.|\n)*?>/g, "") }, true);
       }
     })
     .catch((err) => {
