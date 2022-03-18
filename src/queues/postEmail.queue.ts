@@ -36,10 +36,10 @@ const postEmail = async (email: string, firstName: string, source: string) => {
     firstName,
     source
   };
-  // createJob(GROUPS_PROCESS_NAME, data);
-  // createJob(SPREADSHEET_PROCESS_NAME, data);
+  createJob(GROUPS_PROCESS_NAME, data);
+  createJob(SPREADSHEET_PROCESS_NAME, data);
   createJob(ELOQUA_PROCESS_NAME, data);
-  // createJob(CONFIRMATION_EMAIL_PROCESS_NAME, data);
+  createJob(CONFIRMATION_EMAIL_PROCESS_NAME, data);
 };
 
 export { postEmail, postEmailQueue };

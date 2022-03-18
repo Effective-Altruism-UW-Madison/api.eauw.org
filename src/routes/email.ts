@@ -25,7 +25,7 @@ router.use(bodyParser.json());
 /**
  * POST /email
  * @summary Attempts to add email to list
- *          (Google Sheets and Google Groups)
+ *          (Google Sheets, Google Groups, and Eloqua)
  *          by dispatching a queue worker.
  *          A confirmation email is also sent.
  * @tags email
@@ -69,7 +69,7 @@ router.post("/", async (req: Request, res: Response) => {
 /**
  * DELETE /email
  * @summary Attempts to delete email from list
- *          (Google Sheets and Google Groups)
+ *          (Google Sheets, Google Groups, and Eloqua)
  *          by dispatching a queue worker.
  * @tags email
  * @param {Unsubscription} request.body.required - the unsubscription object - application/json

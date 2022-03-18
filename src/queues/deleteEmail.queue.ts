@@ -1,8 +1,8 @@
 import Bull from "bull";
 
-// import sendConfirmationEmail from "../processes/sendConfirmationEmail.process";
 import deleteFromGroups from "../processes/deleteFromGroups.process";
 import deleteFromSpreadsheet from "../processes/deleteFromSpreadsheet.process";
+import deleteFromEloqua from "../processes/deleteFromEloqua.process";
 
 const deleteEmailQueue = new Bull(
   "DELETE /email",
@@ -11,12 +11,16 @@ const deleteEmailQueue = new Bull(
 
 const GROUPS_PROCESS_NAME = "Delete from Google Groups";
 const SPREADSHEET_PROCESS_NAME = "Delete from Google Spreadsheet";
+const ELOQUA_PROCESS_NAME = "Delete from Eloqua";
 
 deleteEmailQueue.process(GROUPS_PROCESS_NAME, (job: any) =>
   deleteFromGroups(job)
 );
 deleteEmailQueue.process(SPREADSHEET_PROCESS_NAME, (job: any) =>
   deleteFromSpreadsheet(job)
+);
+deleteEmailQueue.process(ELOQUA_PROCESS_NAME, (job: any) =>
+  deleteFromEloqua(job)
 );
 
 const createJob = (name: string, data: any) => {
@@ -31,6 +35,7 @@ const deleteEmail = async (email: string) => {
   };
   createJob(GROUPS_PROCESS_NAME, data);
   createJob(SPREADSHEET_PROCESS_NAME, data);
+  createJob(ELOQUA_PROCESS_NAME, data);
 };
 
 export { deleteEmail, deleteEmailQueue };
