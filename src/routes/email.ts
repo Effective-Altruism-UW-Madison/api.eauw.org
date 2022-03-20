@@ -48,7 +48,7 @@ router.use(bodyParser.json());
  */
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { firstName, email, source } = req.body;
+    const { firstName, email, source, likelySpam } = req.body;
     if (!firstName && !email) {
       return res.status(400).json({ error: "missing first name and email!" });
     }
@@ -57,6 +57,9 @@ router.post("/", async (req: Request, res: Response) => {
     }
     if (!email) {
       return res.status(400).json({ error: "missing email!" });
+    }
+    if (likelySpam) {
+      return res.status(400).json({ error: "likely spam!" });
     }
     await postEmail(email, firstName, source || "unknown");
   } catch (error: any) {
