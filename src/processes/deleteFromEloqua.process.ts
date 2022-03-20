@@ -2,7 +2,9 @@ import { Job } from "bull";
 import fetch from "node-fetch";
 import qs from "qs";
 
-const deleteFromEloqua = async (job: Job) => {
+import { Unsubscription } from "../common/types";
+
+const deleteFromEloqua = async (job: Job<Unsubscription>) => {
   const options = {
     method: "POST",
     qs: { LP: "1028" },

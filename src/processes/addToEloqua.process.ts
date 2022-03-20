@@ -2,7 +2,9 @@ import { Job } from "bull";
 import fetch from "node-fetch";
 import qs from "qs";
 
-const addToEloqua = async (job: Job) => {
+import { Subscription } from "../common/types";
+
+const addToEloqua = async (job: Job<Subscription>) => {
   const options = {
     method: "POST",
     qs: { LP: "1028" },
