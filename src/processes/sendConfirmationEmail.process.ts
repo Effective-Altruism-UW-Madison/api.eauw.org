@@ -20,12 +20,13 @@ const sendConfirmationEmail = async (job: Job<Subscription>) => {
   job.progress(50);
   job.log(`Attempting to authenticate as ${process.env.SMTP_USER}...`);
 
-  const filePath = path.join(__dirname, "../../assets/confirmationEmail.html");
+  const filePath = path.join(__dirname, "../../assets/Welcome.html");
   const source = fs.readFileSync(filePath, "utf-8").toString();
   const template = handlebars.compile(source);
 
   const replacements = {
-    firstName: job.data.firstName
+    firstName: job.data.firstName,
+    email: job.data.email
   };
 
   const html = template(replacements);

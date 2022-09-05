@@ -6,7 +6,7 @@ A web API to facilitate automations and services relevant to our organization in
 
 ### Requirements
 
-#### Create an `.env` file
+#### Create a `.env` file
 
 ```sh
 cp .env.example .env
@@ -31,7 +31,7 @@ Set the environment variables `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USE
 1. Set the environment variable `SPREADSHEET_ID` to the ID of the Google Spreadsheet you'd like to append to.
 2. Set the environment variable `GROUP_ID` to the ID of the Google Group you'd like to add members to.
 
-#### Configure Admin Account for Bull Board Access
+#### Configure admin account for Bull Board access
 
 Set the environment variables `BOARD_USER` and `BOARD_PASS` to a new user account that you would like to use to access the Bull Board dashboard where you'll be able to view and manage incoming requests. You can also set `BOARD_SECRET` to the secret string to be used for the Express session. The dashboard is available at `/admin`.
 
