@@ -2,7 +2,7 @@ import { Job } from "bull";
 import fetch from "node-fetch";
 import qs from "qs";
 
-import { Unsubscription } from "../common/types";
+import { Unsubscription } from "../../common/types";
 
 const deleteFromEloqua = async (job: Job<Unsubscription>) => {
   const options = {

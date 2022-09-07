@@ -1,8 +1,8 @@
 import Bull, { Job } from "bull";
 
-import deleteFromGroups from "../processes/deleteFromGroups.process";
-import deleteFromSpreadsheet from "../processes/deleteFromSpreadsheet.process";
-import deleteFromEloqua from "../processes/deleteFromEloqua.process";
+import deleteFromGroups from "../processes/deleteEmail/deleteFromGroups.process";
+import deleteFromSpreadsheet from "../processes/deleteEmail/deleteFromSpreadsheet.process";
+import deleteFromEloqua from "../processes/deleteEmail/deleteFromEloqua.process";
 import slackNotification from "../processes/slackNotification.process";
 
 import { Unsubscription } from "../common/types";
@@ -40,9 +40,9 @@ const deleteEmail = async (email: string) => {
   const data: Unsubscription = {
     email
   };
-  // createJob(GROUPS_PROCESS_NAME, data);
-  // createJob(SPREADSHEET_PROCESS_NAME, data);
-  // createJob(ELOQUA_PROCESS_NAME, data);
+  createJob(GROUPS_PROCESS_NAME, data);
+  createJob(SPREADSHEET_PROCESS_NAME, data);
+  createJob(ELOQUA_PROCESS_NAME, data);
   createJob(SLACK_NOTIFICATION_PROCESS_NAME, data);
 };
 

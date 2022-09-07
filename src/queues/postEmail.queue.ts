@@ -1,9 +1,9 @@
 import Bull, { Job } from "bull";
 
-import addToGroups from "../processes/addToGroups.process";
-import addToSpreadsheet from "../processes/addToSpreadsheet.process";
-import addToEloqua from "../processes/addToEloqua.process";
-import sendConfirmationEmail from "../processes/sendConfirmationEmail.process";
+import addToGroups from "../processes/postEmail/addToGroups.process";
+import addToSpreadsheet from "../processes/postEmail/addToSpreadsheet.process";
+import addToEloqua from "../processes/postEmail/addToEloqua.process";
+import sendConfirmationEmail from "../processes/postEmail/sendConfirmationEmail.process";
 import slackNotification from "../processes/slackNotification.process";
 
 import { Subscription } from "../common/types";
@@ -43,10 +43,10 @@ const postEmail = async (email: string, firstName: string, source: string) => {
     firstName,
     source
   };
-  // createJob(GROUPS_PROCESS_NAME, data);
-  // createJob(SPREADSHEET_PROCESS_NAME, data);
-  // createJob(ELOQUA_PROCESS_NAME, data);
-  // createJob(CONFIRMATION_EMAIL_PROCESS_NAME, data);
+  createJob(GROUPS_PROCESS_NAME, data);
+  createJob(SPREADSHEET_PROCESS_NAME, data);
+  createJob(ELOQUA_PROCESS_NAME, data);
+  createJob(CONFIRMATION_EMAIL_PROCESS_NAME, data);
   createJob(SLACK_NOTIFICATION_PROCESS_NAME, data);
 };
 

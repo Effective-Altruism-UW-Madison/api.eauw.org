@@ -7,3 +7,10 @@ export type Subscription = {
 export type Unsubscription = {
   email: string;
 };
+
+export type Message = {
+  email: string;
+  name: string;
+  message: string;
+  source: string;
+};

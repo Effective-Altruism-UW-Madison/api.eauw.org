@@ -2,7 +2,7 @@ import { Job } from "bull";
 import fetch from "node-fetch";
 import qs from "qs";
 
-import { Subscription } from "../common/types";
+import { Subscription } from "../../common/types";
 
 const addToEloqua = async (job: Job<Subscription>) => {
   const options = {
@@ -32,7 +32,7 @@ const addToEloqua = async (job: Job<Subscription>) => {
       elqSiteId: "1427524768",
       elqCampaignId: "",
       Email: job.data.email,
-      MOVINGeneral: "on",
+      MOVINGeneral: "on", // this is what indicates a subscription
       hiddenField: "EAM"
     })
   };

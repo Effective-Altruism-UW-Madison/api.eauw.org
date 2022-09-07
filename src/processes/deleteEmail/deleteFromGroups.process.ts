@@ -1,7 +1,7 @@
 import { Job } from "bull";
 import { google } from "googleapis";
 
-import { Unsubscription } from "../common/types";
+import { Unsubscription } from "../../common/types";
 
 const deleteFromGroups = async (job: Job<Unsubscription>) => {
   const SCOPES = [

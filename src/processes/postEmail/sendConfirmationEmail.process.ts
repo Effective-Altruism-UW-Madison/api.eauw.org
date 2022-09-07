@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import handlebars from "handlebars";
 
-import { Subscription } from "../common/types";
+import { Subscription } from "../../common/types";
 
 const sendConfirmationEmail = async (job: Job<Subscription>) => {
   const transporter = nodemailer.createTransport({

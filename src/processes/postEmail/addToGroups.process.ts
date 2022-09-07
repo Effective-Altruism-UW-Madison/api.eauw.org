@@ -1,7 +1,7 @@
 import { Job } from "bull";
 import { google } from "googleapis";
 
-import { Subscription } from "../common/types";
+import { Subscription } from "../../common/types";
 
 const addToGroups = async (job: Job<Subscription>) => {
   const SCOPES = [
