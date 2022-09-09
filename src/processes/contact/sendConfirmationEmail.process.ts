@@ -8,6 +8,7 @@ import { Message } from "../../common/types";
 
 const sendConfirmationEmail = async (job: Job<Message>) => {
   job.log("Sending email...");
+  console.log(job.data.message);
 };
 
 export default sendConfirmationEmail;
