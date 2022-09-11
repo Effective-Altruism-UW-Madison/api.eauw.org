@@ -8,27 +8,19 @@ const router = Router();
 router.use(bodyParser.json());
 
 /**
- * A subscription object
- * @typedef {object} Subscription
- * @property {string} firstName.required - the first name to add to the list
+ * A Message object
+ * @typedef {object} Message
+ * @property {string} name.required - the first name to add to the list
  * @property {string} email.required - the email to add to the list
+ * @property {string} message.required - the message to send
  * @property {string} source - the source of the subscription; defaults to "unknown"
  */
 
 /**
- * An unsubscription object
- * @typedef {object} Unsubscription
- * @property {string} email.required - the email to remove from the list
- */
-
-/**
- * POST /email
- * @summary Attempts to add email to list
- *          (Google Sheets, Google Groups, and Eloqua)
- *          by dispatching a queue worker.
- *          A confirmation email is also sent.
- * @tags email
- * @param {Subscription} request.body.required - the subscription object - application/json
+ * POST /contact
+ * @summary Attempts to send a contact message to the contact email address.
+ * @tags contact
+ * @param {Message} request.body.required - the subscription object - application/json
  * @return {object} 200 - success response - application/json
  * @example response - 200 - success response example
  * {
