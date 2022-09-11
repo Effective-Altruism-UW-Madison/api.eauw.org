@@ -7,6 +7,8 @@ import handlebars from "handlebars";
 import { Subscription } from "../../common/types";
 
 const sendConfirmationEmail = async (job: Job<Subscription>) => {
+  job.log("Defining email settings based on environment variables...");
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
@@ -17,8 +19,8 @@ const sendConfirmationEmail = async (job: Job<Subscription>) => {
     }
   });
 
-  job.progress(50);
-  job.log(`Attempting to authenticate as ${process.env.SMTP_USER}...`);
+  job.progress(25);
+  job.log("Fetching HTML template...");
 
   const filePath = path.join(__dirname, "../../assets/Welcome.html");
   const source = fs.readFileSync(filePath, "utf-8").toString();
@@ -28,6 +30,9 @@ const sendConfirmationEmail = async (job: Job<Subscription>) => {
     firstName: job.data.firstName,
     email: job.data.email
   };
+
+  job.progress(50);
+  job.log("Replacing fields...");
 
   const html = template(replacements);
 
@@ -39,6 +44,7 @@ const sendConfirmationEmail = async (job: Job<Subscription>) => {
   };
 
   job.log("Sending email...");
+  job.log(`Attempting to authenticate as ${process.env.SMTP_USER}...`);
 
   transporter
     .sendMail(mailOptions)
