@@ -6,6 +6,7 @@ import swaggerOptions from "./routes/docs";
 import adminRouter from "./routes/admin";
 import emailRouter from "./routes/email";
 import contactRouter from "./routes/contact";
+import eventsRouter from "./routes/events";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/admin", adminRouter);
 app.use("/email", emailRouter);
 app.use("/contact", contactRouter);
+app.use("/events", eventsRouter);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
