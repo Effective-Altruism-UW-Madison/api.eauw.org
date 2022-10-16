@@ -1,7 +1,9 @@
 import { Job } from "bull";
 import { google } from "googleapis";
 
-const addToGroups = async (job: Job) => {
+import { Subscription } from "../../common/types";
+
+const addToGroups = async (job: Job<Subscription>) => {
   const SCOPES = [
     "https://www.googleapis.com/auth/admin.directory.group",
     "https://www.googleapis.com/auth/admin.directory.group.member"

@@ -1,7 +1,9 @@
 import { Job } from "bull";
 import { google } from "googleapis";
 
-const deleteFromGroups = async (job: Job) => {
+import { Unsubscription } from "../../common/types";
+
+const deleteFromGroups = async (job: Job<Unsubscription>) => {
   const SCOPES = [
     "https://www.googleapis.com/auth/admin.directory.group",
     "https://www.googleapis.com/auth/admin.directory.group.member"

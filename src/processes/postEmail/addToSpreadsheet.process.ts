@@ -1,7 +1,9 @@
 import { Job } from "bull";
 import { google } from "googleapis";
 
-const addToSpreadsheet = async (job: Job) => {
+import { Subscription } from "../../common/types";
+
+const addToSpreadsheet = async (job: Job<Subscription>) => {
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
   const auth = new google.auth.JWT({

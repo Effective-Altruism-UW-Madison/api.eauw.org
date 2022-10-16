@@ -4,7 +4,11 @@ import path from "path";
 import fs from "fs";
 import handlebars from "handlebars";
 
-const sendConfirmationEmail = async (job: Job) => {
+import { Subscription } from "../../common/types";
+
+const sendConfirmationEmail = async (job: Job<Subscription>) => {
+  job.log("Defining email settings based on environment variables...");
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
@@ -15,10 +19,15 @@ const sendConfirmationEmail = async (job: Job) => {
     }
   });
 
-  job.progress(50);
-  job.log(`Attempting to authenticate as ${process.env.SMTP_USER}...`);
+  job.progress(25);
+  job.log("Fetching HTML template...");
 
-  const filePath = path.join(__dirname, "../../assets/Welcome.html");
+  /* 
+    filePath works in both development and production because
+    production builds the project into ·dist/· and development
+    uses ·src/·, which are both at the root of the project
+  */
+  const filePath = path.join(__dirname, "../../../assets/Welcome.html");
   const source = fs.readFileSync(filePath, "utf-8").toString();
   const template = handlebars.compile(source);
 
@@ -27,16 +36,20 @@ const sendConfirmationEmail = async (job: Job) => {
     email: job.data.email
   };
 
+  job.progress(50);
+  job.log("Replacing fields...");
+
   const html = template(replacements);
 
   const mailOptions = {
-    from: process.env.SMTP_USER,
+    from: `Effective Altruism UW\u2013Madison <${process.env.SMTP_USER}>`,
     to: job.data.email,
     subject: `💡 Thanks for your interest, ${job.data.firstName}!`,
     html
   };
 
   job.log("Sending email...");
+  job.log(`Attempting to authenticate as ${process.env.SMTP_USER}...`);
 
   transporter
     .sendMail(mailOptions)

@@ -2,7 +2,9 @@ import { Job } from "bull";
 import fetch from "node-fetch";
 import qs from "qs";
 
-const addToEloqua = async (job: Job) => {
+import { Unsubscription } from "../../common/types";
+
+const deleteFromEloqua = async (job: Job<Unsubscription>) => {
   const options = {
     method: "POST",
     qs: { LP: "1028" },
@@ -30,29 +32,29 @@ const addToEloqua = async (job: Job) => {
       elqSiteId: "1427524768",
       elqCampaignId: "",
       Email: job.data.email,
-      MOVINGeneral: "on",
       hiddenField: "EAM"
+      // removing the "MOVINGeneral" field indicates an unsubscription
     })
   };
 
-  job.log(`Adding ${job.data.email} to Eloqua...`);
+  job.log(`Removing ${job.data.email} from Eloqua...`);
 
   fetch("https://explore.wisc.edu/e/f2", options)
     .then((res) => Promise.all([res.status, res.text()]))
     .then(([status, data]) => {
       if (status === 200 && !data.includes("A problem has occurred")) {
         job.progress(100);
-        job.log(`Added ${job.data.email} to Eloqua.`);
+        job.log(`Removed ${job.data.email} from Eloqua.`);
       } else {
         job.log('Got response "A problem has occurred with this form."');
-        job.log(`Failed to add ${job.data.email} to Eloqua.`);
+        job.log(`Failed to remove ${job.data.email} from Eloqua.`);
         job.moveToFailed({ message: data.replace(/<(.|\n)*?>/g, "") }, true);
       }
     })
     .catch((err) => {
-      job.log(`Failed to add ${job.data.email} to Eloqua.`);
+      job.log(`Failed to remove ${job.data.email} from Eloqua.`);
       job.moveToFailed(err, true);
     });
 };
 
-export default addToEloqua;
+export default deleteFromEloqua;

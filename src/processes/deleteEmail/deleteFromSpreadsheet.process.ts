@@ -1,7 +1,9 @@
 import { Job } from "bull";
 import { google } from "googleapis";
 
-const deleteFromSpreadsheet = async (job: Job) => {
+import { Unsubscription } from "../../common/types";
+
+const deleteFromSpreadsheet = async (job: Job<Unsubscription>) => {
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
   const auth = new google.auth.JWT({
@@ -87,7 +89,7 @@ const deleteFromSpreadsheet = async (job: Job) => {
   if (process.env.SPREADSHEET_ID !== undefined) {
     deleteFromSpreadsheetHelper(
       process.env.SPREADSHEET_ID,
-      "Sheet1!A:D",
+      "Sheet1!A:E",
       search
     );
   } else {

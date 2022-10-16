@@ -49,6 +49,7 @@ router.use(bodyParser.json());
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { firstName, email, source } = req.body;
+
     if (!firstName && !email) {
       return res.status(400).json({ error: "missing first name and email!" });
     }
@@ -58,6 +59,7 @@ router.post("/", async (req: Request, res: Response) => {
     if (!email) {
       return res.status(400).json({ error: "missing email!" });
     }
+
     await postEmail(email, firstName, source || "unknown");
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });

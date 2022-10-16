@@ -11,6 +11,7 @@ import { ExpressAdapter } from "@bull-board/express";
 
 import { postEmailQueue } from "../queues/postEmail.queue";
 import { deleteEmailQueue } from "../queues/deleteEmail.queue";
+import { contactQueue } from "../queues/contact.queue";
 
 const router = Router();
 
@@ -66,7 +67,11 @@ router.post(
 const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
-  queues: [new BullAdapter(postEmailQueue), new BullAdapter(deleteEmailQueue)],
+  queues: [
+    new BullAdapter(postEmailQueue),
+    new BullAdapter(deleteEmailQueue),
+    new BullAdapter(contactQueue)
+  ],
   serverAdapter
 });
 
