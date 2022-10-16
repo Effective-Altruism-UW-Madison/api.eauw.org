@@ -22,7 +22,12 @@ const sendConfirmationEmail = async (job: Job<Subscription>) => {
   job.progress(25);
   job.log("Fetching HTML template...");
 
-  const filePath = path.join(__dirname, "../../assets/Welcome.html");
+  /* 
+    filePath works in both development and production because
+    production builds the project into ·dist/· and development
+    uses ·src/·, which are both at the root of the project
+  */
+  const filePath = path.join(__dirname, "../../../assets/Welcome.html");
   const source = fs.readFileSync(filePath, "utf-8").toString();
   const template = handlebars.compile(source);
 
@@ -37,7 +42,7 @@ const sendConfirmationEmail = async (job: Job<Subscription>) => {
   const html = template(replacements);
 
   const mailOptions = {
-    from: process.env.SMTP_USER,
+    from: `Effective Altruism UW\u2013Madison <${process.env.SMTP_USER}>`,
     to: job.data.email,
     subject: `💡 Thanks for your interest, ${job.data.firstName}!`,
     html

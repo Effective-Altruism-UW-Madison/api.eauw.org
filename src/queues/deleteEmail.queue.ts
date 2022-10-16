@@ -7,15 +7,15 @@ import slackNotification from "../processes/slackNotification.process";
 
 import { Unsubscription } from "../common/types";
 
-const deleteEmailQueue = new Bull(
-  "DELETE /email",
-  process.env.REDIS_URL || "redis://127.0.0.1:6379"
-);
-
 const GROUPS_PROCESS_NAME = "Delete from Google Groups";
 const SPREADSHEET_PROCESS_NAME = "Delete from Google Spreadsheet";
 const ELOQUA_PROCESS_NAME = "Delete from Eloqua";
 const SLACK_NOTIFICATION_PROCESS_NAME = "Send Slack Notification";
+
+const deleteEmailQueue = new Bull(
+  "DELETE /email",
+  process.env.REDIS_URL || "redis://127.0.0.1:6379"
+);
 
 deleteEmailQueue.process(GROUPS_PROCESS_NAME, (job: Job) =>
   deleteFromGroups(job)
@@ -43,7 +43,7 @@ const deleteEmail = async (email: string) => {
   createJob(GROUPS_PROCESS_NAME, data);
   createJob(SPREADSHEET_PROCESS_NAME, data);
   createJob(ELOQUA_PROCESS_NAME, data);
-  createJob(SLACK_NOTIFICATION_PROCESS_NAME, data);
+  // createJob(SLACK_NOTIFICATION_PROCESS_NAME, data);
 };
 
 export { deleteEmail, deleteEmailQueue };

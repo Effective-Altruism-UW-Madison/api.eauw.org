@@ -23,8 +23,7 @@ const slackNotification = async (
   // const web = new WebClient(token);
 
   if (isSubscription(job)) {
-    console.log(`Subscription: ${job.data.firstName}`);
-
+    // console.log(`Subscription: ${job.data.firstName}`);
     // using the Slack JavaScript SDK, send a message to the #subscriptions channel
     // https://slack.dev/node-slack-sdk/web-api
     // https://api.slack.com/methods/chat.postMessage
@@ -33,7 +32,7 @@ const slackNotification = async (
     //   text: `New subscription: ${job.data.firstName} ${job.data.email}`
     // });
   } else {
-    console.log(`Unsubscription: ${job.data.email}`);
+    // console.log(`Unsubscription: ${job.data.email}`);
     // await web.chat.postMessage({
     //   channel: "#subscriptions",
     //   text: `Unsubscription: ${job.data.email}`

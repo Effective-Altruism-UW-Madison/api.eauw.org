@@ -24,7 +24,7 @@ router.use(bodyParser.json());
  * @return {object} 200 - success response - application/json
  * @example response - 200 - success response example
  * {
- *  "message": "email registered."
+ *  "message": "message received."
  * }
  * @return {object} 400 - bad request response
  * @example response - 400 - bad request response example
@@ -40,21 +40,28 @@ router.use(bodyParser.json());
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { name, email, message, source } = req.body;
+
     if (!name && !email) {
-      return res.status(400).json({ error: "missing first name and email!" });
+      return res.status(400).json({ error: "missing name and email!" });
     }
     if (!name) {
-      return res.status(400).json({ error: "missing first name!" });
+      return res.status(400).json({ error: "missing name!" });
     }
     if (!email) {
       return res.status(400).json({ error: "missing email!" });
     }
-    await contact(email, name, message, source || "unknown");
+
+    await contact(
+      email,
+      name,
+      message || "No message received.",
+      source || "unknown"
+    );
   } catch (error: any) {
     return res.status(500).json({ error: error.toString() });
   }
 
-  return res.status(200).json({ message: "contact success." });
+  return res.status(200).json({ message: "message received." });
 });
 
 export default router;
