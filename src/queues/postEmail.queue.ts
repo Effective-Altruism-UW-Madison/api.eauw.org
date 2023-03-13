@@ -14,10 +14,13 @@ const ELOQUA_PROCESS_NAME = "Add to Eloqua";
 const CONFIRMATION_EMAIL_PROCESS_NAME = "Send Confirmation Email";
 const SLACK_NOTIFICATION_PROCESS_NAME = "Send Slack Notification";
 
-const postEmailQueue = new Bull(
-  "POST /email",
-  process.env.REDIS_URL || "redis://127.0.0.1:6379"
-);
+const postEmailQueue = new Bull("POST /email", {
+  redis: {
+    port: parseInt(process.env.REDIS_PORT || "6379", 10),
+    host: process.env.REDIS_HOST,
+    password: process.env.REDIS_PASSWORD
+  }
+});
 
 postEmailQueue.process(GROUPS_PROCESS_NAME, (job: Job) => addToGroups(job));
 postEmailQueue.process(SPREADSHEET_PROCESS_NAME, (job: Job) =>

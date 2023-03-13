@@ -6,10 +6,13 @@ import { Message } from "../common/types";
 
 const MESSAGE_PROCESS_NAME = `Send Message to ${process.env.CONTACT_EMAIL_ADDRESS}`;
 
-const contactQueue = new Bull(
-  "POST /contact",
-  process.env.REDIS_URL || "redis://127.0.0.1:6379"
-);
+const contactQueue = new Bull("POST /contact", {
+  redis: {
+    port: parseInt(process.env.REDIS_PORT || "6379", 10),
+    host: process.env.REDIS_HOST,
+    password: process.env.REDIS_PASSWORD
+  }
+});
 
 contactQueue.process(MESSAGE_PROCESS_NAME, (job: Job<Message>) =>
   sendMessage(job)

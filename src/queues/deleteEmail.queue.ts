@@ -12,10 +12,13 @@ const SPREADSHEET_PROCESS_NAME = "Delete from Google Spreadsheet";
 const ELOQUA_PROCESS_NAME = "Delete from Eloqua";
 const SLACK_NOTIFICATION_PROCESS_NAME = "Send Slack Notification";
 
-const deleteEmailQueue = new Bull(
-  "DELETE /email",
-  process.env.REDIS_URL || "redis://127.0.0.1:6379"
-);
+const deleteEmailQueue = new Bull("DELETE /email", {
+  redis: {
+    port: parseInt(process.env.REDIS_PORT || "6379", 10),
+    host: process.env.REDIS_HOST,
+    password: process.env.REDIS_PASSWORD
+  }
+});
 
 deleteEmailQueue.process(GROUPS_PROCESS_NAME, (job: Job) =>
   deleteFromGroups(job)
