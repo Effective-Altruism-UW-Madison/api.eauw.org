@@ -2,7 +2,7 @@
   "version": "0.0.2",
   "scripts": {
     "start": "NODE_ENV=PRODUCTION node dist/index.js",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --exec 'swc src -d dist && node dist/index.js' --watch src --ext ts",
     "build": "swc src -d dist",
     "check": "tsc --diagnostics",
     "prepare": "husky install",
@@ -53,8 +53,7 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "nodemon": "^2.0.19",
-    "prettier": "^2.7.1",
-    "ts-node": "^10.9.1"
+    "prettier": "^2.7.1"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
