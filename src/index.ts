@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import cors from "cors";
 import express, { Request, Response } from "express";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 
@@ -12,6 +13,8 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
+app.use(cors());
 
 expressJSDocSwagger(app)(swaggerOptions);
 
